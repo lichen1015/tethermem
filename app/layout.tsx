@@ -5,6 +5,16 @@ export const metadata: Metadata = {
   title: "TetherMem — Query-Aware Memory Routing for Long-Horizon Video",
   description:
     "TetherMem preserves subject identity while restoring scene progression in long-horizon autoregressive video generation.",
+  authors: [
+    { name: "Chen Li" },
+    { name: "Peng Zhang" },
+    { name: "Hanyu Zhou" },
+    { name: "Jialong Zuo" },
+    { name: "Fei Wang" },
+    { name: "Daiguo Zhou" },
+    { name: "Nong Sang" },
+    { name: "Changxin Gao" },
+  ],
   openGraph: {
     title: "TetherMem — Tether the Subject, Release the Scene",
     description:
