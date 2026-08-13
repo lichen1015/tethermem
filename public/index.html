@@ -68,14 +68,14 @@
       .heading h2 { margin: 0; font-family: Georgia, "Times New Roman", serif; font-size: clamp(2.3rem, 4.8vw, 4.5rem); font-weight: 500; line-height: 1.06; letter-spacing: -.045em; }
       .heading > p:last-child { max-width: 730px; margin: 20px 0 0; color: var(--muted); font-size: 1.02rem; }
       .method { background: linear-gradient(180deg, #f4f7f9 0, #eaf1f6 100%); }
-      .methodStory { display: grid; gap: 24px; }
-      .methodPanel { display: grid; grid-template-columns: 235px 1fr; gap: 28px; align-items: center; padding: 24px; border: 1px solid #cedbe4; border-radius: 20px; background: rgba(255,255,255,.84); box-shadow: 0 25px 70px rgba(31,73,104,.09); }
-      .panelCopy { padding: 8px 4px; }
-      .panelIndex { width: 37px; height: 37px; margin-bottom: 22px; display: grid; place-items: center; border-radius: 10px; background: #e4f8ff; color: #08799e; font: 780 .78rem/1 ui-monospace, monospace; }
+      .methodStory { display: grid; gap: 54px; }
+      .methodPanel { display: flex; flex-direction: column; align-items: center; gap: 22px; }
+      .panelCopy { max-width: 780px; padding: 0 20px; text-align: center; }
+      .panelIndex { width: 37px; height: 37px; margin: 0 auto 15px; display: grid; place-items: center; border-radius: 10px; background: #e4f8ff; color: #08799e; font: 780 .78rem/1 ui-monospace, monospace; }
       .panelCopy h3 { margin: 0; font-size: 1.25rem; letter-spacing: -.02em; }
       .panelCopy p { margin: 10px 0 0; color: var(--muted); font-size: .9rem; }
-      .methodPanel figure { margin: 0; overflow: hidden; border: 1px solid #d5e0e7; border-radius: 14px; background: #fff; }
-      .methodPanel img { width: 100%; }
+      .methodPanel figure { width: 100%; margin: 0; overflow: hidden; background: transparent; }
+      .methodPanel img { width: 100%; margin-inline: auto; object-fit: contain; }
       .formulaDeck { display: grid; grid-template-columns: 1.45fr .8fr .8fr; gap: 14px; }
       .formulaCard { position: relative; min-height: 150px; padding: 25px; overflow: hidden; border: 1px solid rgba(85,139,177,.26); border-radius: 18px; background: #081522; color: #edf9ff; box-shadow: 0 18px 45px rgba(15,46,69,.14); }
       .formulaCard::after { content: ""; position: absolute; right: -48px; bottom: -80px; width: 180px; height: 180px; border-radius: 50%; background: radial-gradient(circle, rgba(57,217,255,.22), transparent 68%); }
@@ -132,7 +132,7 @@
         .summaryGrid > div { padding: 22px 0; }
         .summaryGrid > div + div { border-left: 0; border-top: 1px solid rgba(141,188,219,.15); }
         section { padding-block: 78px; }
-        .methodPanel { grid-template-columns: 1fr; padding: 16px; }
+        .methodPanel { gap: 16px; }
         .panelCopy { padding: 8px 6px 0; }
         .demoCopy { grid-template-columns: 1fr; }
         .demoCopy .eyebrow { grid-row: auto; }
@@ -180,11 +180,11 @@
       <div class="methodStory">
         <article class="methodPanel">
           <div class="panelCopy"><span class="panelIndex">02A</span><h3>End-to-end routing</h3><p>Current queries, retrieved history, and a time-aligned subject track meet at normalized memory routing. The subject is tethered; the scene is released.</p></div>
-          <figure><img src="assets/figures/method-a.png" alt="Figure 2a: end-to-end TetherMem architecture and qualitative scene outcomes" /></figure>
+          <figure><img src="assets/figures/method-a-cropped.png" alt="Figure 2a: end-to-end TetherMem architecture and qualitative scene outcomes" /></figure>
         </article>
         <article class="methodPanel">
           <div class="panelCopy"><span class="panelIndex">02B</span><h3>From frame selection to query routing</h3><p>Frame-level selection decides which memories survive. TetherMem instead routes subject and scene queries differently within the same retrieved budget.</p></div>
-          <figure><img src="assets/figures/method-b.png" alt="Figure 2b: comparison between prior frame-level memory selection and TetherMem query-conditioned routing" /></figure>
+          <figure><img src="assets/figures/method-b-cropped.png" alt="Figure 2b: comparison between prior frame-level memory selection and TetherMem query-conditioned routing" /></figure>
         </article>
       </div>
     </div></section>
@@ -197,13 +197,13 @@
     <section class="demos" id="demos"><div class="shell">
       <div class="heading"><p class="eyebrow">Interactive demos</p><h2>Watch the trajectory—not only the last frame.</h2><p>Four matched 30-second comparisons show distinct long-horizon behaviors without loading a 120-second file. Choose a scene, then play both streams from the same time.</p></div>
       <div class="demoNav" role="tablist" aria-label="Choose a qualitative comparison">
-        <button class="demoTab" type="button" role="tab" aria-selected="true" aria-controls="demo-p07" data-demo-target="demo-p07"><span>01 · CAMERA MOTION</span><strong>Flower market</strong></button>
+        <button class="demoTab" type="button" role="tab" aria-selected="false" aria-controls="demo-p07" data-demo-target="demo-p07"><span>01 · CAMERA MOTION</span><strong>Flower market</strong></button>
         <button class="demoTab" type="button" role="tab" aria-selected="false" aria-controls="demo-p01" data-demo-target="demo-p01"><span>02 · STABILITY</span><strong>Fisherman harbor</strong></button>
         <button class="demoTab" type="button" role="tab" aria-selected="false" aria-controls="demo-p03" data-demo-target="demo-p03"><span>03 · IDENTITY</span><strong>Dog in park</strong></button>
-        <button class="demoTab" type="button" role="tab" aria-selected="false" aria-controls="demo-p04" data-demo-target="demo-p04"><span>04 · TRANSFER</span><strong>Tokyo woman</strong></button>
+        <button class="demoTab" type="button" role="tab" aria-selected="true" aria-controls="demo-p04" data-demo-target="demo-p04"><span>04 · TRANSFER</span><strong>Tokyo woman</strong></button>
       </div>
       <div class="demoStack">
-        <article class="demo is-active" id="demo-p07" role="tabpanel">
+        <article class="demo" id="demo-p07" role="tabpanel" hidden>
           <div class="demoCopy"><p class="eyebrow">30 seconds · P07 flower vendor</p><h3>A sideways track should leave the opening composition.</h3><p>In this matched rollout, Rolling-Forcing stays close to the opening flower stall while TetherMem reveals new stalls, pedestrians, and street context as the camera moves sideways.</p></div>
           <div class="videos">
             <figure><div class="videoShell"><video controls playsinline preload="metadata" data-sync="p07-30" poster="assets/videos/p07-rolling-forcing-poster.jpg"><source src="assets/videos/p07-rolling-forcing.mp4" type="video/mp4" /></video><span class="label">Rolling-Forcing</span></div><figcaption>Opening composition remains dominant</figcaption></figure>
@@ -230,7 +230,7 @@
           <div class="pairControls"><button class="syncButton" type="button" data-pair="p03-30">Play both from the same time</button></div>
         </article>
 
-        <article class="demo" id="demo-p04" role="tabpanel" hidden>
+        <article class="demo is-active" id="demo-p04" role="tabpanel">
           <div class="demoCopy"><p class="eyebrow">30 seconds · P04 cross-stack</p><h3>TetherMem transfers to the Deep-Forcing attention stack.</h3><p>This matched comparison isolates the routing intervention on Deep-Forcing. The outputs remain close overall, demonstrating cross-stack compatibility.</p></div>
           <div class="videos">
             <figure><div class="videoShell"><video controls playsinline preload="metadata" data-sync="p04-df-30" poster="assets/videos/p04-deep-forcing-poster.jpg"><source src="assets/videos/p04-deep-forcing.mp4" type="video/mp4" /></video><span class="label">Deep-Forcing</span></div><figcaption>Baseline · seed 639693304</figcaption></figure>

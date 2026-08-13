@@ -13,8 +13,9 @@ test("static GitHub Pages version contains the complete project narrative", asyn
   assert.match(html, /assets\/figures\/figure1\.png/);
   assert.doesNotMatch(html, /hero-teaser\.png/);
   assert.match(html, /Normalized routing/);
-  assert.match(html, /assets\/figures\/method-a\.png/);
-  assert.match(html, /assets\/figures\/method-b\.png/);
+  assert.match(html, /assets\/figures\/method-a-cropped\.png/);
+  assert.match(html, /assets\/figures\/method-b-cropped\.png/);
+  assert.match(html, /aria-selected="true"[^>]+aria-controls="demo-p04"/);
   assert.match(html, /assets\/videos\/p07-tethermem\.mp4/);
   assert.match(html, /assets\/videos\/p01-causal-forcing\.mp4/);
   assert.match(html, /assets\/videos\/p03-causvid\.mp4/);

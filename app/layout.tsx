@@ -5,7 +5,6 @@ export const metadata: Metadata = {
   title: "TetherMem — Query-Aware Memory Routing for Long-Horizon Video",
   description:
     "TetherMem preserves subject identity while restoring scene progression in long-horizon autoregressive video generation.",
-  metadataBase: new URL("https://tethermem.openai-apps.com"),
   openGraph: {
     title: "TetherMem — Tether the Subject, Release the Scene",
     description:
