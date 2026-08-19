@@ -22,9 +22,9 @@ test("static GitHub Pages version contains the complete project narrative", asyn
   assert.match(html, /Deep-Forcing \+ TetherMem/);
   assert.match(html, /Chen Li<sup>1,2<\/sup>/);
   assert.match(html, /Peng Zhang<sup>2<\/sup>/);
-  assert.match(html, /Changxin Gao<sup>1<\/sup>/);
+  assert.match(html, /Changxin Gao<sup>1,\*<\/sup>/);
   assert.match(html, /Huazhong University of Science and Technology/);
-  assert.match(html, /Xiaomi Plus/);
+  assert.match(html, /MiLM Plus, Xiaomi Inc\./);
   assert.match(html, /Zhang, Peng and Zhou, Hanyu/);
   assert.doesNotMatch(html, /p07-tethermem-120s|Seaside Painter|P09 painter/i);
 });
