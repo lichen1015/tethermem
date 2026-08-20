@@ -31,6 +31,16 @@ test("static GitHub Pages version contains the complete project narrative", asyn
   assert.match(html, /rel="canonical" href="https:\/\/lichen1015\.github\.io\/tethermem\/"/);
   assert.match(html, /data-route-mode="subject"/);
   assert.match(html, /data-route-mode="scene"/);
+  assert.match(html, /id="results"/);
+  assert.match(html, /Table 1 · Main comparison/);
+  assert.match(html, /class="benchmarkTable"/);
+  assert.match(html, /2,400 blinded judgments/);
+  assert.match(html, /0\.780/);
+  assert.match(html, /0\.769/);
+  assert.match(html, /IntersectionObserver/);
+  assert.match(html, /data-reveal/);
+  assert.match(html, /class="figureShowcase"/);
+  assert.doesNotMatch(html, /paperDisclosure|methodDetails|Open the complete 120-second/);
   assert.equal((html.match(/<video controls/g) ?? []).length, 4);
   assert.doesNotMatch(html, /Play both|data-sync|data-scrubber/);
   assert.match(html, /Copy BibTeX/);

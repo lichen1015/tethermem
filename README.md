@@ -3,8 +3,9 @@
 Public project page for the TetherMem paper, available at
 [lichen1015.github.io/tethermem](https://lichen1015.github.io/tethermem/). It
 contains an interactive query-routing explanation, four pre-aligned 30-second
-side-by-side comparison videos, paper figures, the current paper PDF, and
-placeholders for the final arXiv and code links.
+side-by-side comparison videos, a web-native rendering of the paper's Table 1,
+scroll-revealed paper figures, the current paper PDF, and placeholders for the
+final arXiv and code links.
 
 ## Local preview
 

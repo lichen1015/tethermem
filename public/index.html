@@ -122,6 +122,11 @@
       .heading { max-width: 850px; margin-bottom: 48px; }
       .heading h2 { margin: 0; font-family: var(--serif); font-size: clamp(2.35rem, 4.8vw, 4.55rem); font-weight: 500; line-height: 1.05; letter-spacing: -.046em; }
       .heading > p:last-child { max-width: 730px; margin: 19px 0 0; color: var(--muted); font-size: 1rem; }
+      .srOnly { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+      .revealReady [data-reveal] { opacity: 0; transform: translateY(30px) scale(.992); transition: opacity .82s ease, transform .82s cubic-bezier(.18, .8, .2, 1); transition-delay: var(--reveal-delay, 0s); }
+      .revealReady [data-reveal].isVisible { opacity: 1; transform: none; }
+      .revealReady [data-reveal] img { transform: scale(1.018); transition: transform 1.15s cubic-bezier(.18, .8, .2, 1); }
+      .revealReady [data-reveal].isVisible img { transform: none; }
 
       .demos { color: #eaf6ff; background: var(--night); background-image: radial-gradient(circle at 100% 20%, rgba(39, 134, 255, .19), transparent 31rem), linear-gradient(rgba(64, 223, 255, .028) 1px, transparent 1px), linear-gradient(90deg, rgba(64, 223, 255, .028) 1px, transparent 1px); background-size: auto, 64px 64px, 64px 64px; }
       .demos .heading { margin-bottom: 37px; }
@@ -150,6 +155,56 @@
       .comparisonFrame figcaption span { padding: 11px 14px 13px; }
       .comparisonFrame figcaption span + span { border-left: 1px solid rgba(101, 148, 180, .22); }
 
+      .benchmarkSection { position: relative; overflow: hidden; background: #edf3f2; }
+      .benchmarkSection::before { content: ""; position: absolute; top: -240px; right: -180px; width: 620px; height: 620px; border-radius: 50%; background: radial-gradient(circle, rgba(64, 223, 255, .12), transparent 67%); pointer-events: none; }
+      .benchmarkSection .heading { position: relative; z-index: 1; }
+      .resultHighlights { position: relative; z-index: 1; margin-bottom: 14px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 11px; }
+      .resultHighlight { min-height: 142px; padding: 23px 24px; border: 1px solid #d3dfdc; border-radius: 17px; background: #fff; }
+      .resultHighlight.primary { border-color: #173143; background: linear-gradient(145deg, #07131f, #123541); color: #fff; box-shadow: 0 17px 42px rgba(7, 19, 31, .14); }
+      .resultHighlight.balance { border-color: #99d9cf; background: linear-gradient(145deg, #fff, #eaf9f5); }
+      .resultHighlight span, .resultHighlight small { display: block; }
+      .resultHighlight span { color: #77858d; font: 720 .61rem/1.2 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .09em; text-transform: uppercase; }
+      .resultHighlight.primary span { color: var(--cyan); }
+      .resultHighlight strong { display: block; margin: 12px 0 7px; font-family: var(--serif); font-size: clamp(2rem, 3.3vw, 3.15rem); line-height: .95; letter-spacing: -.05em; }
+      .resultHighlight.primary strong { color: #a8ffde; }
+      .resultHighlight.balance strong { color: #087f96; }
+      .resultHighlight small { color: #77858d; font-size: .72rem; }
+      .resultHighlight.primary small { color: #96aeb9; }
+      .benchmarkPanel { position: relative; z-index: 1; overflow: hidden; border: 1px solid #cedbd8; border-radius: 23px; background: #fff; box-shadow: 0 24px 66px rgba(26, 57, 72, .11); }
+      .benchmarkToolbar { min-height: 69px; padding: 13px 18px; display: flex; align-items: center; justify-content: space-between; gap: 20px; border-bottom: 1px solid #dbe4e1; background: #f5f8f7; }
+      .tableTag { padding: 10px 14px; display: inline-flex; align-items: center; gap: 8px; border-radius: 9px; background: #0c1d2b; color: #fff; font: 740 .66rem/1 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .08em; text-transform: uppercase; }
+      .tableTag i { width: 8px; height: 8px; border-radius: 50%; background: var(--cyan); box-shadow: 0 0 12px rgba(64, 223, 255, .55); }
+      .benchmarkLegend { display: flex; align-items: center; gap: 14px; color: #71808a; font: .61rem/1 ui-monospace, SFMono-Regular, Menlo, monospace; text-transform: uppercase; }
+      .benchmarkLegend b { padding: 5px 7px; border: 1px solid #9ddcd0; border-radius: 7px; background: #e9f9f5; color: #087f78; }
+      .benchmarkLegend u { color: #48616f; text-decoration-color: #168fa7; text-decoration-thickness: 2px; text-underline-offset: 3px; }
+      .benchmarkMeta { padding: 20px 23px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; border-bottom: 1px solid #dbe4e1; }
+      .benchmarkMeta span, .benchmarkMeta strong { display: block; }
+      .benchmarkMeta span { color: #8a969d; font: .6rem/1.2 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .07em; text-transform: uppercase; }
+      .benchmarkMeta strong { margin-top: 6px; color: #253d4b; font-size: .78rem; }
+      .benchmarkTableWrap { overflow-x: auto; scrollbar-color: #9cb6bd #edf2f2; }
+      .benchmarkTable { width: 100%; min-width: 1120px; border-collapse: separate; border-spacing: 0; font-variant-numeric: tabular-nums; }
+      .benchmarkTable th, .benchmarkTable td { padding: 13px 11px; border-right: 1px solid #e2e9e7; border-bottom: 1px solid #e2e9e7; text-align: center; white-space: nowrap; }
+      .benchmarkTable tr > *:last-child { border-right: 0; }
+      .benchmarkTable thead th { background: #f7f9f8; color: #66757e; font: 720 .64rem/1.25 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .045em; text-transform: uppercase; }
+      .benchmarkTable thead tr:first-child th { padding-top: 15px; padding-bottom: 10px; color: #294351; }
+      .benchmarkTable thead tr:last-child th { padding-top: 9px; padding-bottom: 13px; }
+      .benchmarkTable thead th:first-child { position: sticky; left: 0; z-index: 3; min-width: 190px; padding-left: 23px; text-align: left; }
+      .benchmarkTable tbody tr:not(.groupRow) > th { position: sticky; left: 0; z-index: 2; min-width: 190px; padding-left: 23px; background: #fff; color: #223b49; font-size: .76rem; font-weight: 690; text-align: left; }
+      .benchmarkTable tbody td { color: #53636d; font: .72rem/1 ui-monospace, SFMono-Regular, Menlo, monospace; }
+      .benchmarkTable tbody tr:not(.groupRow) td:nth-child(n+3):nth-child(-n+6) { background: rgba(41, 159, 170, .028); }
+      .benchmarkTable tbody tr:not(.groupRow):hover > * { background-color: #f2f9f8; }
+      .benchmarkTable .groupRow th { padding: 10px 23px; background: #edf2f1; color: #607079; font: italic 720 .63rem/1.2 ui-sans-serif, sans-serif; letter-spacing: .035em; text-align: left; }
+      .benchmarkTable .ours > th, .benchmarkTable .ours > td { background: #eaf9f5 !important; border-bottom-color: #b9ddd5; }
+      .benchmarkTable .ours > th { box-shadow: inset 4px 0 0 #16a5b0; color: #075f73; font-weight: 830; }
+      .oursBadge { margin-left: 7px; padding: 3px 6px; border-radius: 999px; background: #c9f3e9; color: #087f78; font: 720 .52rem/1 ui-monospace, monospace; letter-spacing: .05em; text-transform: uppercase; }
+      .metricBest { position: relative; min-width: 55px; padding: 13px 7px 6px; display: inline-block; border: 1px solid #9ddcd0; border-radius: 9px; background: #e7f8f4; color: #087f78; font-weight: 820; }
+      .metricBest::after { content: "best"; position: absolute; top: 3px; right: 5px; color: #168f89; font-size: .4rem; letter-spacing: .04em; text-transform: uppercase; }
+      .metricSecond { color: #294957; font-weight: 730; text-decoration: underline; text-decoration-color: #159db7; text-decoration-thickness: 2px; text-underline-offset: 3px; }
+      .metricNa { color: #a8b1b5; }
+      .benchmarkFoot { padding: 17px 23px; display: flex; justify-content: space-between; gap: 28px; background: #f7f9f8; color: #74828a; font-size: .69rem; }
+      .benchmarkFoot span { max-width: 830px; }
+      .benchmarkFoot b { color: #087f78; font-weight: 720; }
+
       .problem { background: #f8fafb; }
       .problemLead { display: grid; grid-template-columns: .95fr 1.25fr; gap: 80px; align-items: end; }
       .problemLead .heading { margin: 0; }
@@ -163,13 +218,12 @@
       .failureCard p { margin: 0; color: var(--muted); font-size: .83rem; }
       .failureTag { margin-top: auto; padding-top: 23px; color: #8c5c4a; font: 720 .65rem/1.35 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .05em; text-transform: uppercase; }
       .failureCard.tether .failureTag { color: #0783aa; }
-      .paperDisclosure { margin-top: 27px; overflow: hidden; border: 1px solid #d4dfe6; border-radius: 17px; background: #fff; }
-      .paperDisclosure summary { padding: 20px 23px; display: flex; align-items: center; justify-content: space-between; gap: 20px; color: #1e394a; font-weight: 760; cursor: pointer; list-style: none; }
-      .paperDisclosure summary::-webkit-details-marker { display: none; }
-      .paperDisclosure summary::after { content: "+"; width: 29px; height: 29px; display: grid; place-items: center; border-radius: 50%; background: #eaf3f8; color: #087da5; font-size: 1.1rem; }
-      .paperDisclosure[open] summary::after { content: "−"; }
-      .disclosureBody { padding: 0 17px 18px; }
-      .disclosureBody img { width: 100%; border: 1px solid #e0e8ed; border-radius: 11px; background: #fff; }
+      .figureShowcase { margin: 31px 0 0; padding: 0 17px 18px; overflow: hidden; border: 1px solid #d4dfe6; border-radius: 19px; background: #fff; box-shadow: 0 20px 58px rgba(30, 65, 91, .08); }
+      .figureBar { min-height: 62px; display: flex; align-items: center; justify-content: space-between; gap: 20px; color: #1e394a; font-weight: 770; }
+      .figureBar > span:first-child { font-size: .8rem; letter-spacing: -.01em; }
+      .figureBar > span:last-child { padding: 6px 9px; border-radius: 999px; background: #e8f6fa; color: #087da5; font: 720 .59rem/1 ui-monospace, monospace; letter-spacing: .07em; text-transform: uppercase; }
+      .figureCanvas { overflow: hidden; border: 1px solid #dfe8ed; border-radius: 12px; background: #fff; }
+      .figureCanvas img { width: 100%; background: #fff; }
       .caption { max-width: 900px; margin: 14px auto 0; color: #738392; font-size: .78rem; }
 
       .method { background: linear-gradient(180deg, var(--paper-blue), #f2f6f8); }
@@ -213,12 +267,6 @@
       .panelCopy p { margin: 7px 0 0; color: var(--muted); font-size: .84rem; }
       .methodPanel figure { margin: 0; padding: 0 15px 15px; }
       .methodPanel img { width: 100%; }
-      .methodDetails { overflow: hidden; border: 1px solid #d4e0e7; border-radius: 18px; background: rgba(255, 255, 255, .72); }
-      .methodDetails summary { padding: 19px 22px; display: flex; align-items: center; justify-content: space-between; gap: 20px; color: #294354; font-weight: 750; cursor: pointer; list-style: none; }
-      .methodDetails summary::-webkit-details-marker { display: none; }
-      .methodDetails summary::after { content: "Open figure +"; color: #087da5; font: 700 .67rem/1 ui-monospace, monospace; letter-spacing: .04em; }
-      .methodDetails[open] summary::after { content: "Close figure −"; }
-      .methodDetails figure { margin: 0; padding: 0 15px 15px; }
 
       .results { background: #fff; }
       .evidenceIntro { display: grid; grid-template-columns: 1fr auto; align-items: end; gap: 40px; }
@@ -252,6 +300,9 @@
       .footerGrid p { margin: 8px 0 0; color: var(--muted); font-size: .78rem; }
 
       @media (max-width: 960px) {
+        .resultHighlights { grid-template-columns: 1fr 1fr; }
+        .resultHighlight.primary { grid-column: 1 / -1; }
+        .benchmarkMeta { grid-template-columns: 1fr 1fr; }
         .problemLead { grid-template-columns: 1fr; gap: 28px; }
         .failureGrid { grid-template-columns: 1fr 1fr; }
         .routeDiagram { grid-template-columns: 1fr; gap: 15px; }
@@ -283,6 +334,13 @@
         .label.baseline { left: 8px; }
         .label.tm { left: calc(50% + 8px); }
         .comparisonFrame figcaption { font-size: .65rem; }
+        .resultHighlights { grid-template-columns: 1fr; }
+        .resultHighlight.primary { grid-column: auto; }
+        .benchmarkToolbar { align-items: flex-start; flex-direction: column; }
+        .benchmarkLegend { flex-wrap: wrap; }
+        .benchmarkMeta { grid-template-columns: 1fr 1fr; }
+        .benchmarkTable { min-width: 1040px; }
+        .benchmarkFoot { flex-direction: column; gap: 9px; }
         .failureGrid { grid-template-columns: 1fr; }
         .failureCard { min-height: 210px; }
         .routeToolbar { align-items: flex-start; flex-direction: column; }
@@ -310,6 +368,8 @@
       @media (prefers-reduced-motion: reduce) {
         html { scroll-behavior: auto; }
         *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+        .revealReady [data-reveal] { opacity: 1; transform: none; }
+        .revealReady [data-reveal] img { transform: none; }
       }
     </style>
   </head>
@@ -319,7 +379,7 @@
     <div class="navWrap">
       <nav class="topbar shell" aria-label="Primary navigation">
         <a class="wordmark" href="#top"><span class="mark">T</span><span>TetherMem</span></a>
-        <div class="navlinks"><a href="#demo">Demo</a><a href="#problem">Problem</a><a href="#method">Method</a><a href="#evidence">Evidence</a><a href="#citation">Citation</a></div>
+        <div class="navlinks"><a href="#demo">Demo</a><a href="#results">Results</a><a href="#problem">Problem</a><a href="#method">Method</a><a href="#evidence">Evidence</a></div>
         <a class="navCta" href="assets/paper/tethermem-paper.pdf">Paper ↗</a>
       </nav>
     </div>
@@ -363,7 +423,7 @@
           <button class="demoTab" type="button" role="tab" id="tab-p04" aria-selected="false" aria-controls="demo-p04" data-demo-target="demo-p04"><span>04 · TRANSFER</span><strong>Tokyo woman</strong></button>
         </div>
 
-        <div class="demoStack">
+        <div class="demoStack" data-reveal>
           <article class="demo isActive" id="demo-p07" role="tabpanel" aria-labelledby="tab-p07">
             <div class="demoCopy"><p class="eyebrow">30 seconds · P07 flower vendor</p><h3>A sideways track should leave the opening composition.</h3><p>Rolling-Forcing stays close to the opening flower stall. TetherMem reveals new stalls, pedestrians, and street context while keeping the vendor identifiable.</p></div>
             <figure class="comparisonFrame"><div class="comparisonVideo"><video controls playsinline preload="metadata" poster="assets/videos/p07-comparison-poster.jpg"><source src="assets/videos/p07-comparison.mp4" type="video/mp4" /></video><span class="label baseline">Rolling-Forcing</span><span class="label tm">TetherMem</span></div><figcaption><span>Left · opening composition remains dominant</span><span>Right · same P07 prompt and seed, with sustained scene progression</span></figcaption></figure>
@@ -386,29 +446,81 @@
         </div>
       </div></section>
 
+      <section class="benchmarkSection" id="results"><div class="shell">
+        <div class="heading" data-reveal><p class="eyebrow">Table 1 · Main comparison</p><h2>See the full trade-off, not one convenient metric.</h2><p>Human expected preference measures the complete 30-second experience. Short-clip quality, motion, and VBench diagnostics remain visible beside it, so identity retention cannot be mistaken for scene progression.</p></div>
+
+        <div class="resultHighlights" data-reveal style="--reveal-delay: .05s">
+          <article class="resultHighlight primary"><span>Highest overall preference</span><strong>0.780 EP</strong><small>#1 among nine long-video methods</small></article>
+          <article class="resultHighlight balance"><span>Highest scene progression</span><strong>0.769 EP</strong><small>+0.161 over the strongest baseline</small></article>
+          <article class="resultHighlight"><span>Identity remains competitive</span><strong>0.600 EP</strong><small>Second-highest identity estimate</small></article>
+        </div>
+
+        <div class="benchmarkPanel" data-reveal style="--reveal-delay: .1s">
+          <div class="benchmarkToolbar"><span class="tableTag"><i></i>Table 1 · full results</span><div class="benchmarkLegend"><b>Best value</b><u>Second best</u><span>All metrics ↑</span></div></div>
+          <div class="benchmarkMeta">
+            <div><span>Evaluation window</span><strong>Complete 30-second videos</strong></div>
+            <div><span>Human evidence</span><strong>2,400 blinded judgments</strong></div>
+            <div><span>Annotators</span><strong>10 independent raters</strong></div>
+            <div><span>Preference scale</span><strong>Tie-aware Davidson EP</strong></div>
+          </div>
+          <div class="benchmarkTableWrap" tabindex="0" aria-label="Scrollable Table 1 results">
+            <table class="benchmarkTable">
+              <caption class="srOnly">Table 1. Main comparison with human preference and VBench diagnostics.</caption>
+              <thead>
+                <tr><th rowspan="2" scope="col">Method</th><th colspan="1" scope="colgroup">5s</th><th colspan="4" scope="colgroup">30s human EP ↑</th><th colspan="1" scope="colgroup">Diag.</th><th colspan="4" scope="colgroup">VBench ↑</th></tr>
+                <tr><th scope="col">Img5 ↑</th><th scope="col">Ovr.</th><th scope="col">Prog.</th><th scope="col">ID</th><th scope="col">L1</th><th scope="col">nT ↑</th><th scope="col">Subj.</th><th scope="col">Back.</th><th scope="col">Smooth.</th><th scope="col">Dyn.</th></tr>
+              </thead>
+              <tbody>
+                <tr class="groupRow"><th colspan="11" scope="rowgroup">Base model · non-autoregressive</th></tr>
+                <tr><th scope="row">Wan2.1-T2V-1.3B</th><td>65.6</td><td class="metricNa">—</td><td class="metricNa">—</td><td class="metricNa">—</td><td class="metricNa">—</td><td>0.322</td><td class="metricNa">—</td><td class="metricNa">—</td><td class="metricNa">—</td><td class="metricNa">—</td></tr>
+
+                <tr class="groupRow"><th colspan="11" scope="rowgroup">Long-memory / retrieval</th></tr>
+                <tr><th scope="row">LongLive-RAG</th><td>71.0</td><td>0.615</td><td><span class="metricSecond">0.608</span></td><td>0.507</td><td>0.587</td><td>0.868</td><td>0.861</td><td>0.897</td><td>0.973</td><td><span class="metricSecond">0.867</span></td></tr>
+
+                <tr class="groupRow"><th colspan="11" scope="rowgroup">Forcing-based generation</th></tr>
+                <tr><th scope="row">Self Forcing</th><td>70.5</td><td>0.320</td><td>0.356</td><td>0.437</td><td>0.273</td><td>0.192</td><td>0.885</td><td>0.907</td><td>0.983</td><td>0.767</td></tr>
+                <tr><th scope="row">Rolling Forcing</th><td><span class="metricBest">72.2</span></td><td>0.553</td><td>0.429</td><td><span class="metricBest">0.633</span></td><td>0.651</td><td>0.040</td><td><span class="metricBest">0.933</span></td><td><span class="metricBest">0.935</span></td><td><span class="metricSecond">0.985</span></td><td>0.433</td></tr>
+                <tr><th scope="row">Deep Forcing</th><td>70.5</td><td>0.526</td><td>0.495</td><td>0.531</td><td>0.508</td><td>0.350</td><td>0.899</td><td>0.916</td><td>0.983</td><td>0.800</td></tr>
+                <tr><th scope="row">Causal Forcing</th><td>70.2</td><td>0.210</td><td>0.440</td><td>0.285</td><td>0.158</td><td><span class="metricSecond">1.226</span></td><td>0.824</td><td>0.873</td><td>0.973</td><td><span class="metricSecond">0.867</span></td></tr>
+                <tr><th scope="row">Reward Forcing</th><td>69.3</td><td>0.573</td><td>0.530</td><td>0.487</td><td>0.620</td><td>0.366</td><td><span class="metricSecond">0.903</span></td><td><span class="metricSecond">0.927</span></td><td><span class="metricSecond">0.985</span></td><td>0.733</td></tr>
+
+                <tr class="groupRow"><th colspan="11" scope="rowgroup">Memory / positional methods</th></tr>
+                <tr><th scope="row">MemRoPE</th><td><span class="metricSecond">72.1</span></td><td><span class="metricSecond">0.640</span></td><td>0.578</td><td>0.559</td><td><span class="metricSecond">0.666</span></td><td>0.551</td><td>0.892</td><td>0.908</td><td><span class="metricBest">0.986</span></td><td>0.700</td></tr>
+                <tr><th scope="row">CausVid</th><td>65.9</td><td>0.283</td><td>0.295</td><td>0.461</td><td>0.328</td><td>0.190</td><td>0.879</td><td>0.896</td><td>0.982</td><td>0.767</td></tr>
+
+                <tr class="groupRow"><th colspan="11" scope="rowgroup">Spatiotemporal memory routing</th></tr>
+                <tr class="ours"><th scope="row">TetherMem <span class="oursBadge">Ours</span></th><td>71.1</td><td><span class="metricBest">0.780</span></td><td><span class="metricBest">0.769</span></td><td><span class="metricSecond">0.600</span></td><td><span class="metricBest">0.708</span></td><td><span class="metricBest">1.289</span></td><td>0.855</td><td>0.895</td><td>0.973</td><td><span class="metricSecond">0.867</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="benchmarkFoot"><span><b>Human EP:</b> Ovr. = overall preference, Prog. = scene progression, ID = subject identity, L1 = visual integrity. Baseline–baseline preferences are model-inferred; every TetherMem–baseline edge is directly observed.</span><span>Bold cards = best · underline = second best</span></div>
+        </div>
+      </div></section>
+
       <section class="problem" id="problem"><div class="shell">
         <div class="problemLead">
           <div class="heading"><p class="eyebrow">The problem</p><h2>One memory policy cannot serve two opposite needs.</h2><p>Subject identity needs long-range access. Scene progression needs recency. Applying one frame-level memory policy to both creates the familiar identity–progression trade-off.</p></div>
           <div class="thesisCard">The real choice is not “remember or forget.” It is <em>which query should read which part of memory.</em></div>
         </div>
 
-        <div class="failureGrid" aria-label="Long-horizon failure modes">
+        <div class="failureGrid" aria-label="Long-horizon failure modes" data-reveal>
           <article class="failureCard"><span class="failureIcon">RF</span><h3>Rolling-Forcing</h3><p>A short rolling context can preserve local continuity while repeatedly returning to the opening view.</p><span class="failureTag">Failure · stagnation</span></article>
           <article class="failureCard"><span class="failureIcon">DF</span><h3>Deep-Forcing</h3><p>Long-range motion can continue even as spatial detail and trajectory coherence deteriorate.</p><span class="failureTag">Failure · incoherent motion</span></article>
           <article class="failureCard"><span class="failureIcon">RAG</span><h3>LongLive-RAG</h3><p>Frame-level retrieval gives subject and scene queries the same historical context, limiting progression.</p><span class="failureTag">Failure · shared policy</span></article>
           <article class="failureCard tether"><span class="failureIcon">TM</span><h3>TetherMem</h3><p>Query-aware routing keeps identity-bearing history available while scene queries favor recent states.</p><span class="failureTag">Route · subject ≠ scene</span></article>
         </div>
 
-        <details class="paperDisclosure">
-          <summary><span>Open the complete 120-second comparison · FIGURE 1</span></summary>
-          <div class="disclosureBody"><img src="assets/figures/figure1.png" loading="lazy" alt="Figure 1: four 120-second video trajectories comparing Rolling Forcing, Deep Forcing, LongLive-RAG, and TetherMem" /><p class="caption">Figure 1. A shared 120-second timeline exposes distinct failure modes: stagnation, incoherent motion, limited progression, and sustained scene evolution.</p></div>
-        </details>
+        <figure class="figureShowcase" data-reveal style="--reveal-delay: .06s">
+          <div class="figureBar"><span>Complete long-horizon comparison · FIGURE 1</span><span>120 seconds</span></div>
+          <div class="figureCanvas"><img src="assets/figures/figure1.png" loading="lazy" alt="Figure 1: four 120-second video trajectories comparing Rolling Forcing, Deep Forcing, LongLive-RAG, and TetherMem" /></div>
+          <figcaption class="caption">Figure 1. A shared 120-second timeline exposes distinct failure modes: stagnation, incoherent motion, limited progression, and sustained scene evolution.</figcaption>
+        </figure>
       </div></section>
 
       <section class="method" id="method"><div class="shell">
         <div class="heading"><p class="eyebrow">Method</p><h2>Route memory at the query level.</h2><p>TetherMem places a positive spatiotemporal routing prior inside attention normalization. Switch the query below to see how the same retrieved memory is read differently.</p></div>
 
-        <div class="routingExplorer" data-routing-mode="subject">
+        <div class="routingExplorer" data-routing-mode="subject" data-reveal>
           <div class="routeToolbar"><span>Interactive routing view</span><div class="routeTabs" role="tablist" aria-label="Choose a query type"><button class="routeTab" type="button" role="tab" aria-selected="true" data-route-mode="subject">Subject query</button><button class="routeTab" type="button" role="tab" aria-selected="false" data-route-mode="scene">Scene query</button></div></div>
           <div class="routeDiagram">
             <div class="routeNode queryNode"><span>Current query</span><strong data-query-label>Subject query</strong><small data-query-copy>“Is this still the same person?”</small></div>
@@ -436,14 +548,14 @@
         </div>
 
         <div class="methodStory">
-          <article class="methodPanel">
+          <article class="methodPanel" data-reveal>
             <div class="panelCopy"><span class="panelIndex">02A</span><h3>End-to-end routing</h3><p>Current queries, retrieved history, and a time-aligned subject track meet at normalized memory routing. The subject is tethered; the scene is released.</p></div>
             <figure><img src="assets/figures/method-a-cropped.png" loading="lazy" alt="Figure 2a: end-to-end TetherMem architecture and qualitative scene outcomes" /></figure>
           </article>
-          <details class="methodDetails">
-            <summary>From frame selection to query routing · FIGURE 2B</summary>
+          <article class="methodPanel" data-reveal style="--reveal-delay: .06s">
+            <div class="panelCopy"><span class="panelIndex">02B</span><h3>From frame selection to query routing</h3><p>Frame-level selection decides which memories survive. TetherMem instead routes subject and scene queries differently inside the same retrieved memory budget.</p></div>
             <figure><img src="assets/figures/method-b-cropped.png" loading="lazy" alt="Figure 2b: comparison between prior frame-level memory selection and TetherMem query-conditioned routing" /></figure>
-          </details>
+          </article>
         </div>
       </div></section>
 
@@ -452,12 +564,12 @@
           <div class="heading"><p class="eyebrow">Evidence</p><h2>Identity and progression can coexist.</h2><p>Human preference distinguishes coherent scene development from raw motion. TetherMem occupies the high-identity, high-progression region, while strong motion alone is not sufficient.</p></div>
           <div class="evidenceBadge"><strong>76.9%</strong><span>scene-progression expected preference</span></div>
         </div>
-        <figure class="paperFigure"><img src="assets/figures/evidence-landscape.png" loading="lazy" alt="Scatter plots comparing identity, scene progression, and normalized translation across video methods" /></figure>
+        <figure class="paperFigure" data-reveal><img src="assets/figures/evidence-landscape.png" loading="lazy" alt="Scatter plots comparing identity, scene progression, and normalized translation across video methods" /></figure>
       </div></section>
 
       <section class="trajectories" id="trajectories"><div class="shell">
         <div class="heading"><p class="eyebrow">Qualitative trajectories</p><h2>Progression appears across scenes.</h2><p>Matched trajectories sample the same backbone pair across multiple prompts and seven timestamps over the 30-second evaluation window.</p></div>
-        <figure class="trajectory"><img src="assets/figures/trajectories.png" loading="lazy" alt="Matched LongLive-RAG and TetherMem trajectories across four prompts and seven timestamps" /></figure>
+        <figure class="trajectory" data-reveal><img src="assets/figures/trajectories.png" loading="lazy" alt="Matched LongLive-RAG and TetherMem trajectories across four prompts and seven timestamps" /></figure>
       </div></section>
 
       <section class="citationSection" id="citation"><div class="shell citationGrid">
@@ -478,6 +590,22 @@
     <footer><div class="shell footerGrid"><div><a class="wordmark" href="#top"><span class="mark">T</span><span>TetherMem</span></a><p>A joint research project by HUST and MiLM Plus, Xiaomi Inc.</p></div><div class="brand"><img src="assets/brand/hust.png" alt="Huazhong University of Science and Technology" /><img src="assets/brand/xiaomi.png" alt="MiLM Plus, Xiaomi Inc." /></div></div></footer>
 
     <script>
+      const revealItems = [...document.querySelectorAll("[data-reveal]")];
+      const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      if ("IntersectionObserver" in window && !reducedMotion) {
+        document.documentElement.classList.add("revealReady");
+        const revealObserver = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (!entry.isIntersecting) return;
+            entry.target.classList.add("isVisible");
+            revealObserver.unobserve(entry.target);
+          });
+        }, { threshold: .12, rootMargin: "0px 0px -7%" });
+        revealItems.forEach((item) => revealObserver.observe(item));
+      } else {
+        revealItems.forEach((item) => item.classList.add("isVisible"));
+      }
+
       const demoTabs = [...document.querySelectorAll("[data-demo-target]")];
       const demoPanels = [...document.querySelectorAll(".demo[role='tabpanel']")];
 
