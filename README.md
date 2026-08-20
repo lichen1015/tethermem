@@ -4,8 +4,9 @@ Public project page for the TetherMem paper, available at
 [lichen1015.github.io/tethermem](https://lichen1015.github.io/tethermem/). It
 contains an interactive query-routing explanation, four pre-aligned 30-second
 side-by-side comparison videos, a web-native rendering of the paper's Table 1,
-scroll-revealed paper figures, the current paper PDF, and placeholders for the
-final arXiv and code links.
+scroll-revealed paper figures, and placeholders for the future arXiv and code
+links. The manuscript is intentionally not hosted on the project page before
+its arXiv release.
 
 ## Local preview
 
@@ -24,9 +25,8 @@ GitHub Pages publishes only `public/`.
 
 ## Before public release
 
-- Replace the temporary paper PDF with the final arXiv PDF.
-- Insert the arXiv and code URLs in `public/index.html` (and `app/page.tsx` if
-  retaining the component version).
+- Publish the manuscript on arXiv, then insert the arXiv and code URLs in
+  `public/index.html` (and `app/page.tsx` if retaining the component version).
 - Replace the placeholder BibTeX entry after arXiv assigns the identifier.
 - Confirm public-release permission for every video, logo, and baseline name.
 - If traffic or the video catalog grows, move videos to object storage and keep

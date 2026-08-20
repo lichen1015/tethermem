@@ -58,6 +58,11 @@ test("release placeholders remain explicit", async () => {
 
   assert.match(html, /arXiv · coming soon/);
   assert.match(html, /Code · coming soon/);
+  assert.doesNotMatch(html, /assets\/paper\/|tethermem-paper\.pdf|Read the paper|>Paper ↗/);
+  await assert.rejects(
+    stat(new URL("../public/assets/paper/tethermem-paper.pdf", import.meta.url)),
+    (error) => error?.code === "ENOENT",
+  );
   assert.match(packageJson, /"name": "tethermem-project-page"/);
   assert.doesNotMatch(html, /codex-preview|SkeletonPreview/);
 });
