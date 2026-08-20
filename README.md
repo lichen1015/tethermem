@@ -2,9 +2,9 @@
 
 Public project page for the TetherMem paper, available at
 [lichen1015.github.io/tethermem](https://lichen1015.github.io/tethermem/). It
-contains an interactive query-routing explanation, four synchronized
-30-second video comparisons with a shared timeline, paper figures, the current
-paper PDF, and placeholders for the final arXiv and code links.
+contains an interactive query-routing explanation, four pre-aligned 30-second
+side-by-side comparison videos, paper figures, the current paper PDF, and
+placeholders for the final arXiv and code links.
 
 ## Local preview
 
@@ -33,11 +33,11 @@ GitHub Pages publishes only `public/`.
 
 ## Video quality
 
-The page videos are copied from the audited 832×480 H.264 single-stream
-sources. The selected comparisons cover P01 Fisherman Harbor, P03 Dog in Park,
-P07 Flower Vendor, and P04 Tokyo Woman; the 120-second file and the P09 Seaside
-Painter example are intentionally excluded. The web copies use fast-start MP4
-indexing without re-encoding the video stream, so the page adds no compression
-loss. A true lossless release
-requires upstream lossless frames or a lossless master; transcoding an already
-lossy MP4 to a lossless codec cannot restore discarded detail.
+The selected comparisons cover P01 Fisherman Harbor, P03 Dog in Park, P07
+Flower Vendor, and P04 Tokyo Woman; the 120-second file and the P09 Seaside
+Painter example are intentionally excluded. Each web demo combines two audited
+832×480 H.264 sources into one 1664×480 side-by-side H.264 file with fast-start
+indexing and a high-quality CRF 17 delivery encode. The original single-stream
+sources remain in the repository. A true lossless release requires upstream
+lossless frames or a lossless master; transcoding an already lossy MP4 to a
+lossless codec cannot restore discarded detail.

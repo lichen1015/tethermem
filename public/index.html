@@ -139,19 +139,16 @@
       .demoCopy .eyebrow { grid-row: 1 / span 2; }
       .demoCopy h3 { margin: 0; font-family: var(--serif); font-size: clamp(1.55rem, 3vw, 2.42rem); font-weight: 500; line-height: 1.08; letter-spacing: -.03em; }
       .demoCopy > p:last-child { margin: 12px 0 0; color: #8ea3b3; font-size: .87rem; }
-      .videos { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: rgba(101, 148, 180, .25); }
-      .videos figure { margin: 0; background: #08111b; }
-      .videoShell { position: relative; background: #020508; }
-      .videoShell video { width: 100%; aspect-ratio: 832 / 480; background: #020508; }
-      .label { position: absolute; top: 13px; left: 13px; padding: 6px 10px; border: 1px solid rgba(255, 255, 255, .14); border-radius: 7px; background: rgba(5, 12, 19, .78); color: #fff; font-size: .7rem; font-weight: 760; backdrop-filter: blur(10px); pointer-events: none; }
-      .label.tm { border-color: rgba(64, 223, 255, .42); background: rgba(10, 92, 120, .84); color: #dcfaff; }
-      .videos figcaption { padding: 10px 14px 12px; color: #8095a5; font-size: .72rem; }
-      .pairControls { padding: 15px 17px; display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 18px; border-top: 1px solid rgba(101, 148, 180, .2); }
-      .syncButton { min-height: 42px; padding: 9px 16px; border: 1px solid rgba(64, 223, 255, .4); border-radius: 999px; background: rgba(11, 50, 70, .76); color: #dffaff; font: 730 .75rem/1 ui-sans-serif, sans-serif; cursor: pointer; }
-      .syncButton:hover { border-color: var(--cyan); box-shadow: 0 0 22px rgba(64, 223, 255, .12); }
-      .timeline { min-width: 0; display: grid; grid-template-columns: auto minmax(100px, 1fr) auto; align-items: center; gap: 12px; color: #7f96a7; font-size: .7rem; }
-      .timeline input { width: 100%; accent-color: var(--cyan); cursor: pointer; }
-      .timeline output { min-width: 76px; color: #aec2cf; font: .68rem/1 ui-monospace, SFMono-Regular, Menlo, monospace; text-align: right; }
+      .comparisonFrame { margin: 0; background: #08111b; }
+      .comparisonVideo { position: relative; overflow: hidden; background: #020508; }
+      .comparisonVideo video { width: 100%; aspect-ratio: 1664 / 480; background: #020508; }
+      .comparisonVideo::after { content: ""; position: absolute; top: 0; bottom: 46px; left: 50%; width: 1px; background: rgba(255, 255, 255, .34); box-shadow: 0 0 10px rgba(0, 0, 0, .55); pointer-events: none; }
+      .label { position: absolute; top: 13px; padding: 6px 10px; border: 1px solid rgba(255, 255, 255, .14); border-radius: 7px; background: rgba(5, 12, 19, .78); color: #fff; font-size: .7rem; font-weight: 760; backdrop-filter: blur(10px); pointer-events: none; }
+      .label.baseline { left: 13px; }
+      .label.tm { left: calc(50% + 13px); border-color: rgba(64, 223, 255, .42); background: rgba(10, 92, 120, .84); color: #dcfaff; }
+      .comparisonFrame figcaption { display: grid; grid-template-columns: 1fr 1fr; color: #8095a5; font-size: .72rem; }
+      .comparisonFrame figcaption span { padding: 11px 14px 13px; }
+      .comparisonFrame figcaption span + span { border-left: 1px solid rgba(101, 148, 180, .22); }
 
       .problem { background: #f8fafb; }
       .problemLead { display: grid; grid-template-columns: .95fr 1.25fr; gap: 80px; align-items: end; }
@@ -273,7 +270,7 @@
         .hero { min-height: 0; padding: 116px 0 72px; }
         .labLockup { margin-bottom: 28px; }
         .hero h1 { font-size: clamp(3rem, 15vw, 4.85rem); }
-        .summaryGrid, .formulaDeck, .videos, .citationGrid { grid-template-columns: 1fr; }
+        .summaryGrid, .formulaDeck, .citationGrid { grid-template-columns: 1fr; }
         .summaryGrid > div { padding: 21px 0; }
         .summaryGrid > div + div { border-left: 0; border-top: 1px solid rgba(141, 188, 219, .15); }
         section { padding-block: 78px; }
@@ -282,9 +279,10 @@
         .demoTab { min-height: 71px; padding: 12px; }
         .demoCopy { padding: 24px 20px 20px; grid-template-columns: 1fr; }
         .demoCopy .eyebrow { grid-row: auto; }
-        .pairControls { grid-template-columns: 1fr; gap: 13px; }
-        .timeline { grid-template-columns: 1fr auto; }
-        .timeline > span { display: none; }
+        .label { top: 8px; padding: 4px 7px; font-size: .58rem; }
+        .label.baseline { left: 8px; }
+        .label.tm { left: calc(50% + 8px); }
+        .comparisonFrame figcaption { font-size: .65rem; }
         .failureGrid { grid-template-columns: 1fr; }
         .failureCard { min-height: 210px; }
         .routeToolbar { align-items: flex-start; flex-direction: column; }
@@ -357,7 +355,7 @@
       </div>
 
       <section class="demos" id="demo"><div class="shell">
-        <div class="heading"><p class="eyebrow">See the effect first</p><h2>Watch the trajectory—not only the last frame.</h2><p>Four matched 30-second comparisons expose distinct long-horizon behaviors. Choose a scene, then use the shared timeline to compare both streams at exactly the same moment.</p></div>
+        <div class="heading"><p class="eyebrow">See the effect first</p><h2>Watch the trajectory—not only the last frame.</h2><p>Four matched 30-second comparisons expose distinct long-horizon behaviors. Each case is pre-aligned into one side-by-side video, so a single playback control moves both methods through the same moment.</p></div>
         <div class="demoNav" role="tablist" aria-label="Choose a qualitative comparison">
           <button class="demoTab" type="button" role="tab" id="tab-p07" aria-selected="true" aria-controls="demo-p07" data-demo-target="demo-p07"><span>01 · PROGRESSION</span><strong>Flower market</strong></button>
           <button class="demoTab" type="button" role="tab" id="tab-p01" aria-selected="false" aria-controls="demo-p01" data-demo-target="demo-p01"><span>02 · STABILITY</span><strong>Fisherman harbor</strong></button>
@@ -368,38 +366,22 @@
         <div class="demoStack">
           <article class="demo isActive" id="demo-p07" role="tabpanel" aria-labelledby="tab-p07">
             <div class="demoCopy"><p class="eyebrow">30 seconds · P07 flower vendor</p><h3>A sideways track should leave the opening composition.</h3><p>Rolling-Forcing stays close to the opening flower stall. TetherMem reveals new stalls, pedestrians, and street context while keeping the vendor identifiable.</p></div>
-            <div class="videos">
-              <figure><div class="videoShell"><video controls playsinline preload="metadata" data-sync="p07-30" poster="assets/videos/p07-rolling-forcing-poster.jpg"><source src="assets/videos/p07-rolling-forcing.mp4" type="video/mp4" /></video><span class="label">Rolling-Forcing</span></div><figcaption>Opening composition remains dominant</figcaption></figure>
-              <figure><div class="videoShell"><video controls playsinline preload="metadata" data-sync="p07-30" poster="assets/videos/p07-tethermem-poster.jpg"><source src="assets/videos/p07-tethermem.mp4" type="video/mp4" /></video><span class="label tm">TetherMem</span></div><figcaption>Same P07 prompt and seed · independent 30-second rollout</figcaption></figure>
-            </div>
-            <div class="pairControls" data-sync-controls="p07-30"><button class="syncButton" type="button" data-pair="p07-30">Play both</button><label class="timeline"><span>Shared timeline</span><input type="range" min="0" max="30" step="0.05" value="0" data-scrubber="p07-30" aria-label="Shared timeline for the flower market comparison" /><output data-time="p07-30">0:00 / 0:30</output></label></div>
+            <figure class="comparisonFrame"><div class="comparisonVideo"><video controls playsinline preload="metadata" poster="assets/videos/p07-comparison-poster.jpg"><source src="assets/videos/p07-comparison.mp4" type="video/mp4" /></video><span class="label baseline">Rolling-Forcing</span><span class="label tm">TetherMem</span></div><figcaption><span>Left · opening composition remains dominant</span><span>Right · same P07 prompt and seed, with sustained scene progression</span></figcaption></figure>
           </article>
 
           <article class="demo" id="demo-p01" role="tabpanel" aria-labelledby="tab-p01" hidden>
             <div class="demoCopy"><p class="eyebrow">30 seconds · P01 fisherman harbor</p><h3>Coherent motion survives the full rollout.</h3><p>The videos share the P01 prompt and seed. Causal-Forcing darkens and loses scene detail in the later window; TetherMem retains the fisherman, his action, and the evolving harbor.</p></div>
-            <div class="videos">
-              <figure><div class="videoShell"><video controls playsinline preload="metadata" data-sync="p01-30" poster="assets/videos/p01-causal-forcing-poster.jpg"><source src="assets/videos/p01-causal-forcing.mp4" type="video/mp4" /></video><span class="label">Causal-Forcing</span></div><figcaption>Late-window contrast loss and scene degradation</figcaption></figure>
-              <figure><div class="videoShell"><video controls playsinline preload="metadata" data-sync="p01-30" poster="assets/videos/p01-tethermem-poster.jpg"><source src="assets/videos/p01-tethermem.mp4" type="video/mp4" /></video><span class="label tm">TetherMem</span></div><figcaption>Same P01 prompt and seed · independent 30-second rollout</figcaption></figure>
-            </div>
-            <div class="pairControls" data-sync-controls="p01-30"><button class="syncButton" type="button" data-pair="p01-30">Play both</button><label class="timeline"><span>Shared timeline</span><input type="range" min="0" max="30" step="0.05" value="0" data-scrubber="p01-30" aria-label="Shared timeline for the fisherman harbor comparison" /><output data-time="p01-30">0:00 / 0:30</output></label></div>
+            <figure class="comparisonFrame"><div class="comparisonVideo"><video controls playsinline preload="metadata" poster="assets/videos/p01-comparison-poster.jpg"><source src="assets/videos/p01-comparison.mp4" type="video/mp4" /></video><span class="label baseline">Causal-Forcing</span><span class="label tm">TetherMem</span></div><figcaption><span>Left · late-window contrast loss and scene degradation</span><span>Right · same P01 prompt and seed, with a coherent evolving harbor</span></figcaption></figure>
           </article>
 
           <article class="demo" id="demo-p03" role="tabpanel" aria-labelledby="tab-p03" hidden>
             <div class="demoCopy"><p class="eyebrow">30 seconds · P03 dog in park</p><h3>Keep the dog identifiable as the park unfolds.</h3><p>This matched static-camera case separates subject continuity from uncontrolled scale drift. TetherMem preserves the dog while introducing new, coherent park context.</p></div>
-            <div class="videos">
-              <figure><div class="videoShell"><video controls playsinline preload="metadata" data-sync="p03-30" poster="assets/videos/p03-causvid-poster.jpg"><source src="assets/videos/p03-causvid.mp4" type="video/mp4" /></video><span class="label">CausVid</span></div><figcaption>Subject scale and framing drift over time</figcaption></figure>
-              <figure><div class="videoShell"><video controls playsinline preload="metadata" data-sync="p03-30" poster="assets/videos/p03-tethermem-poster.jpg"><source src="assets/videos/p03-tethermem.mp4" type="video/mp4" /></video><span class="label tm">TetherMem</span></div><figcaption>Same P03 prompt and seed · independent 30-second rollout</figcaption></figure>
-            </div>
-            <div class="pairControls" data-sync-controls="p03-30"><button class="syncButton" type="button" data-pair="p03-30">Play both</button><label class="timeline"><span>Shared timeline</span><input type="range" min="0" max="30" step="0.05" value="0" data-scrubber="p03-30" aria-label="Shared timeline for the dog in park comparison" /><output data-time="p03-30">0:00 / 0:30</output></label></div>
+            <figure class="comparisonFrame"><div class="comparisonVideo"><video controls playsinline preload="metadata" poster="assets/videos/p03-comparison-poster.jpg"><source src="assets/videos/p03-comparison.mp4" type="video/mp4" /></video><span class="label baseline">CausVid</span><span class="label tm">TetherMem</span></div><figcaption><span>Left · subject scale and framing drift over time</span><span>Right · same P03 prompt and seed, with stable identity and new context</span></figcaption></figure>
           </article>
 
           <article class="demo" id="demo-p04" role="tabpanel" aria-labelledby="tab-p04" hidden>
             <div class="demoCopy"><p class="eyebrow">30 seconds · P04 cross-stack</p><h3>TetherMem transfers to the Deep-Forcing attention stack.</h3><p>This matched comparison isolates the routing intervention on Deep-Forcing. The outputs remain close overall, demonstrating cross-stack compatibility.</p></div>
-            <div class="videos">
-              <figure><div class="videoShell"><video controls playsinline preload="metadata" data-sync="p04-df-30" poster="assets/videos/p04-deep-forcing-poster.jpg"><source src="assets/videos/p04-deep-forcing.mp4" type="video/mp4" /></video><span class="label">Deep-Forcing</span></div><figcaption>Baseline · seed 639693304</figcaption></figure>
-              <figure><div class="videoShell"><video controls playsinline preload="metadata" data-sync="p04-df-30" poster="assets/videos/p04-deep-forcing-tethermem-poster.jpg"><source src="assets/videos/p04-deep-forcing-tethermem.mp4" type="video/mp4" /></video><span class="label tm">Deep-Forcing + TetherMem</span></div><figcaption>Same prompt, seed, and 30-second duration</figcaption></figure>
-            </div>
-            <div class="pairControls" data-sync-controls="p04-df-30"><button class="syncButton" type="button" data-pair="p04-df-30">Play both</button><label class="timeline"><span>Shared timeline</span><input type="range" min="0" max="30" step="0.05" value="0" data-scrubber="p04-df-30" aria-label="Shared timeline for the Tokyo comparison" /><output data-time="p04-df-30">0:00 / 0:30</output></label></div>
+            <figure class="comparisonFrame"><div class="comparisonVideo"><video controls playsinline preload="metadata" poster="assets/videos/p04-deep-forcing-comparison-poster.jpg"><source src="assets/videos/p04-deep-forcing-comparison.mp4" type="video/mp4" /></video><span class="label baseline">Deep-Forcing</span><span class="label tm">Deep-Forcing + TetherMem</span></div><figcaption><span>Left · Deep-Forcing baseline, seed 639693304</span><span>Right · same prompt, seed, and 30-second duration</span></figcaption></figure>
           </article>
         </div>
       </div></section>
@@ -523,78 +505,6 @@
           const next = demoTabs[(index + direction + demoTabs.length) % demoTabs.length];
           activateDemo(next);
           next.focus();
-        });
-      });
-
-      const formatTime = (seconds) => {
-        const safe = Number.isFinite(seconds) ? Math.max(0, seconds) : 0;
-        const minutes = Math.floor(safe / 60);
-        return `${minutes}:${String(Math.floor(safe % 60)).padStart(2, '0')}`;
-      };
-
-      document.querySelectorAll("[data-sync-controls]").forEach((controls) => {
-        const id = controls.dataset.syncControls;
-        const button = controls.querySelector(`[data-pair="${id}"]`);
-        const scrubber = controls.querySelector(`[data-scrubber="${id}"]`);
-        const output = controls.querySelector(`[data-time="${id}"]`);
-        const videos = [...document.querySelectorAll(`video[data-sync="${id}"]`)];
-        let syncing = false;
-
-        const duration = () => {
-          const values = videos.map((video) => video.duration).filter(Number.isFinite);
-          return values.length ? Math.min(...values) : Number(scrubber.max);
-        };
-
-        const updateTimeline = (time = videos[0]?.currentTime || 0) => {
-          const total = duration();
-          scrubber.max = String(total || 30);
-          scrubber.value = String(Math.min(time, total || 30));
-          output.value = `${formatTime(time)} / ${formatTime(total || 30)}`;
-        };
-
-        videos.forEach((video) => {
-          video.addEventListener("loadedmetadata", () => updateTimeline());
-          video.addEventListener("ended", () => {
-            if (videos.every((item) => item.ended || item.paused)) button.textContent = "Replay both";
-          });
-          video.addEventListener("seeked", () => {
-            if (syncing) return;
-            syncing = true;
-            videos.forEach((other) => {
-              if (other !== video && Math.abs(other.currentTime - video.currentTime) > .08) other.currentTime = video.currentTime;
-            });
-            updateTimeline(video.currentTime);
-            requestAnimationFrame(() => { syncing = false; });
-          });
-        });
-
-        videos[0]?.addEventListener("timeupdate", () => {
-          updateTimeline(videos[0].currentTime);
-          if (!videos[0].paused && videos[1] && Math.abs(videos[1].currentTime - videos[0].currentTime) > .18) videos[1].currentTime = videos[0].currentTime;
-        });
-
-        scrubber.addEventListener("input", () => {
-          const time = Number(scrubber.value);
-          videos.forEach((video) => {
-            video.pause();
-            video.currentTime = time;
-          });
-          button.textContent = "Play both";
-          updateTimeline(time);
-        });
-
-        button.addEventListener("click", async () => {
-          const allPlaying = videos.every((video) => !video.paused && !video.ended);
-          if (allPlaying) {
-            videos.forEach((video) => video.pause());
-            button.textContent = "Play both";
-            return;
-          }
-          let sharedTime = Number(scrubber.value);
-          if (videos.every((video) => video.ended) || sharedTime >= duration() - .1) sharedTime = 0;
-          videos.forEach((video) => { video.currentTime = sharedTime; });
-          await Promise.allSettled(videos.map((video) => video.play()));
-          button.textContent = "Pause both";
         });
       });
 
