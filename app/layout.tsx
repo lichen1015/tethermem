@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://lichen1015.github.io/tethermem/"),
   title: "TetherMem — Query-Aware Memory Routing for Long-Horizon Video",
   description:
     "TetherMem preserves subject identity while restoring scene progression in long-horizon autoregressive video generation.",
@@ -16,6 +17,8 @@ export const metadata: Metadata = {
     { name: "Changxin Gao" },
   ],
   openGraph: {
+    type: "article",
+    url: "https://lichen1015.github.io/tethermem/",
     title: "TetherMem — Tether the Subject, Release the Scene",
     description:
       "Query-aware memory routing for long-horizon autoregressive video generation.",
@@ -31,6 +34,9 @@ export const metadata: Metadata = {
   icons: {
     icon: "/favicon.svg",
     shortcut: "/favicon.svg",
+  },
+  alternates: {
+    canonical: "https://lichen1015.github.io/tethermem/",
   },
 };
 

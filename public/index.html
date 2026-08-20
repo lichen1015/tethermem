@@ -3,262 +3,484 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#060b13" />
+    <meta name="theme-color" content="#06101a" />
     <meta name="description" content="TetherMem preserves subject identity while restoring scene progression in long-horizon autoregressive video generation." />
+    <link rel="canonical" href="https://lichen1015.github.io/tethermem/" />
+    <meta property="og:type" content="article" />
     <meta property="og:title" content="TetherMem — Tether the Subject, Release the Scene" />
     <meta property="og:description" content="Query-aware memory routing for long-horizon autoregressive video generation." />
-    <meta property="og:image" content="og.png" />
+    <meta property="og:url" content="https://lichen1015.github.io/tethermem/" />
+    <meta property="og:image" content="https://lichen1015.github.io/tethermem/og.png" />
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="TetherMem — Tether the Subject, Release the Scene" />
+    <meta name="twitter:description" content="Query-aware memory routing for long-horizon autoregressive video generation." />
+    <meta name="twitter:image" content="https://lichen1015.github.io/tethermem/og.png" />
     <title>TetherMem — Query-Aware Memory Routing for Long-Horizon Video</title>
     <link rel="icon" href="favicon.svg" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "ScholarlyArticle",
+        "headline": "Tether the Subject, Release the Scene: Query-Aware Memory Routing for Long-Horizon Autoregressive Video Generation",
+        "description": "TetherMem preserves subject identity while restoring scene progression in long-horizon autoregressive video generation.",
+        "datePublished": "2026",
+        "url": "https://lichen1015.github.io/tethermem/",
+        "image": "https://lichen1015.github.io/tethermem/og.png",
+        "isAccessibleForFree": true,
+        "author": [
+          { "@type": "Person", "name": "Chen Li" },
+          { "@type": "Person", "name": "Peng Zhang" },
+          { "@type": "Person", "name": "Hanyu Zhou" },
+          { "@type": "Person", "name": "Jialong Zuo" },
+          { "@type": "Person", "name": "Fei Wang" },
+          { "@type": "Person", "name": "Daiguo Zhou" },
+          { "@type": "Person", "name": "Nong Sang" },
+          { "@type": "Person", "name": "Changxin Gao" }
+        ],
+        "publisher": [
+          { "@type": "Organization", "name": "Huazhong University of Science and Technology" },
+          { "@type": "Organization", "name": "MiLM Plus, Xiaomi Inc." }
+        ]
+      }
+    </script>
     <style>
       :root {
-        --night: #060b13;
-        --night-2: #0b1420;
-        --panel: rgba(15, 27, 41, 0.78);
+        --night: #06101a;
+        --night-2: #0a1825;
+        --night-3: #102437;
         --paper: #f4f7f9;
+        --paper-blue: #eaf1f6;
+        --white: #ffffff;
         --ink: #10202e;
-        --muted: #657383;
-        --line: rgba(142, 173, 197, 0.22);
-        --cyan: #39d9ff;
+        --muted: #627282;
+        --line: #d2dee6;
+        --cyan: #40dfff;
         --blue: #2786ff;
-        --violet: #876dff;
-        --orange: #ff6b2b;
+        --violet: #8b73ff;
+        --orange: #ff7847;
         --green: #2ee6a6;
-        --max: 1240px;
+        --max: 1200px;
+        --serif: Georgia, "Times New Roman", serif;
       }
+
       * { box-sizing: border-box; }
-      html { scroll-behavior: smooth; }
+      html { scroll-behavior: smooth; scroll-padding-top: 96px; }
       body { margin: 0; background: var(--paper); color: var(--ink); font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; line-height: 1.62; text-rendering: optimizeLegibility; }
       a { color: inherit; text-decoration: none; }
+      button, input { font: inherit; }
       img, video { display: block; max-width: 100%; }
+      button:focus-visible, a:focus-visible, summary:focus-visible, input:focus-visible { outline: 3px solid rgba(64, 223, 255, .72); outline-offset: 3px; }
       .shell { width: min(calc(100% - 44px), var(--max)); margin-inline: auto; }
-      .dark-surface { color: #ecf7ff; background: var(--night); background-image: radial-gradient(circle at 80% 2%, rgba(39,134,255,.22), transparent 26rem), radial-gradient(circle at 15% 35%, rgba(135,109,255,.14), transparent 30rem), linear-gradient(rgba(57,217,255,.035) 1px, transparent 1px), linear-gradient(90deg, rgba(57,217,255,.035) 1px, transparent 1px); background-size: auto, auto, 56px 56px, 56px 56px; }
-      nav { height: 78px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(160,208,237,.14); }
-      .wordmark { display: inline-flex; align-items: center; gap: 11px; font-weight: 780; letter-spacing: -.03em; }
-      .mark { width: 31px; height: 31px; display: grid; place-items: center; border-radius: 9px; color: #03121d; background: linear-gradient(135deg, var(--cyan), #a5f6ff); box-shadow: 0 0 24px rgba(57,217,255,.28); font-family: Georgia, serif; }
-      .navlinks { display: flex; gap: 30px; color: #9db0bf; font-size: .88rem; }
+      .skipLink { position: fixed; top: 10px; left: 10px; z-index: 200; padding: 9px 13px; border-radius: 8px; background: #fff; color: #07131e; transform: translateY(-160%); transition: transform .15s ease; }
+      .skipLink:focus { transform: translateY(0); }
+
+      .navWrap { position: fixed; top: 0; left: 0; z-index: 100; width: 100%; padding: 14px 0; pointer-events: none; }
+      .topbar { min-height: 58px; padding: 8px 10px 8px 15px; display: flex; align-items: center; justify-content: space-between; gap: 24px; border: 1px solid rgba(153, 204, 233, .22); border-radius: 18px; background: rgba(6, 16, 26, .78); box-shadow: 0 15px 45px rgba(0, 0, 0, .22); backdrop-filter: blur(18px) saturate(135%); pointer-events: auto; }
+      .wordmark { display: inline-flex; align-items: center; gap: 10px; color: #ecf8ff; font-weight: 790; letter-spacing: -.03em; }
+      .mark { width: 31px; height: 31px; display: grid; place-items: center; border-radius: 9px; background: linear-gradient(135deg, var(--cyan), #a5f6ff); color: #03121d; box-shadow: 0 0 24px rgba(64, 223, 255, .26); font-family: var(--serif); }
+      .navlinks { display: flex; align-items: center; gap: 25px; color: #9bb0bf; font-size: .83rem; }
+      .navlinks a { transition: color .15s ease; }
       .navlinks a:hover { color: var(--cyan); }
-      .hero { padding: 90px 0 70px; text-align: center; }
-      .kicker, .eyebrow { margin: 0 0 12px; color: #1591b9; font-size: .72rem; font-weight: 820; letter-spacing: .17em; text-transform: uppercase; }
-      .dark-surface .kicker, .dark-surface .eyebrow { color: var(--cyan); }
-      .hero h1 { max-width: 1060px; margin: 0 auto; font-family: Georgia, "Times New Roman", serif; font-size: clamp(3.3rem, 7.4vw, 7.6rem); font-weight: 500; line-height: .98; letter-spacing: -.065em; }
-      .hero h1 span { color: transparent; background: linear-gradient(90deg, var(--cyan), #92abff 52%, #b68cff); -webkit-background-clip: text; background-clip: text; }
-      .subtitle { max-width: 810px; margin: 32px auto 0; color: #a9bac8; font-size: clamp(1.05rem, 1.8vw, 1.32rem); }
-      .authors { max-width: 1050px; margin: 24px auto 0; display: grid; gap: 8px; font-size: .94rem; }
+      .navCta { min-height: 38px; padding: 8px 14px; display: inline-flex; align-items: center; justify-content: center; border: 1px solid rgba(64, 223, 255, .44); border-radius: 999px; background: rgba(17, 64, 87, .72); color: #effcff; font-size: .79rem; font-weight: 760; }
+
+      .darkSurface { position: relative; overflow: hidden; color: #edf8ff; background: var(--night); background-image: radial-gradient(circle at 78% 10%, rgba(39, 134, 255, .25), transparent 28rem), radial-gradient(circle at 12% 48%, rgba(139, 115, 255, .14), transparent 32rem), linear-gradient(rgba(64, 223, 255, .035) 1px, transparent 1px), linear-gradient(90deg, rgba(64, 223, 255, .035) 1px, transparent 1px); background-size: auto, auto, 56px 56px, 56px 56px; }
+      .darkSurface::after { content: ""; position: absolute; inset: auto 0 0; height: 180px; background: linear-gradient(transparent, rgba(8, 22, 34, .78)); pointer-events: none; }
+      .hero { position: relative; z-index: 1; min-height: 720px; padding: 142px 0 90px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+      .labLockup { margin-bottom: 33px; padding: 8px 14px; display: inline-flex; align-items: center; gap: 12px; border: 1px solid rgba(151, 198, 228, .18); border-radius: 999px; background: rgba(8, 22, 34, .5); color: #9fb4c2; font-size: .71rem; letter-spacing: .04em; }
+      .labLockup img { width: auto; height: 23px; object-fit: contain; filter: brightness(0) invert(1); opacity: .9; }
+      .labLockup img:last-of-type { height: 19px; }
+      .labLockup .plus { color: var(--cyan); font-weight: 800; }
+      .kicker, .eyebrow { margin: 0 0 12px; color: #087eaa; font-size: .71rem; font-weight: 830; letter-spacing: .17em; text-transform: uppercase; }
+      .darkSurface .kicker, .demos .eyebrow { color: var(--cyan); }
+      .hero h1 { max-width: 1070px; margin: 0 auto; font-family: var(--serif); font-size: clamp(3.45rem, 7.6vw, 7.75rem); font-weight: 500; line-height: .95; letter-spacing: -.066em; }
+      .hero h1 span { color: transparent; background: linear-gradient(90deg, var(--cyan), #91b8ff 54%, #bf9bff); -webkit-background-clip: text; background-clip: text; }
+      .subtitle { max-width: 810px; margin: 31px auto 0; color: #a9bdca; font-size: clamp(1.02rem, 1.8vw, 1.28rem); }
+      .authors { max-width: 1060px; margin: 25px auto 0; display: grid; gap: 8px; font-size: .91rem; }
       .authorNames { display: flex; flex-wrap: wrap; justify-content: center; gap: 5px 19px; color: #f4fbff; font-weight: 690; }
       .authorNames span { white-space: nowrap; }
       .authors sup { margin-left: 2px; color: var(--cyan); font-size: .64em; font-weight: 780; }
-      .affiliations { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 20px; color: #8296a7; font-size: .86rem; }
+      .affiliations { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 20px; color: #8298a8; font-size: .84rem; }
       .affiliations sup { margin-right: 4px; }
       .actions { margin-top: 31px; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
-      .button { min-height: 45px; padding: 10px 18px; border: 1px solid rgba(157,190,215,.28); border-radius: 999px; display: inline-flex; align-items: center; gap: 9px; background: rgba(12,26,39,.64); color: #c7d4dd; font-size: .88rem; font-weight: 720; }
-      .button.primary { border-color: rgba(57,217,255,.55); background: linear-gradient(135deg, #14395b, #0c263b); color: #fff; box-shadow: 0 0 28px rgba(57,217,255,.12); }
+      .button { min-height: 46px; padding: 10px 18px; border: 1px solid rgba(157, 190, 215, .28); border-radius: 999px; display: inline-flex; align-items: center; gap: 9px; background: rgba(12, 26, 39, .64); color: #c7d4dd; font-size: .86rem; font-weight: 730; transition: transform .16s ease, border-color .16s ease, color .16s ease; }
+      .button:hover { transform: translateY(-2px); }
+      .button.primary { border-color: rgba(64, 223, 255, .55); background: linear-gradient(135deg, #154568, #0b293d); color: #fff; box-shadow: 0 0 28px rgba(64, 223, 255, .12); }
       .button.primary:hover { border-color: var(--cyan); }
-      .button.pending { color: #6f8291; }
-      .heroFigure { position: relative; margin: 66px auto 0; padding: 15px; border: 1px solid rgba(77,172,230,.32); border-radius: 22px; background: linear-gradient(135deg, rgba(21,39,58,.92), rgba(8,17,28,.92)); box-shadow: 0 35px 100px rgba(0,0,0,.46), 0 0 70px rgba(39,134,255,.1); }
-      .heroFigure::before { content: "FIGURE 1  ·  120-SECOND TRAJECTORY"; position: absolute; top: -14px; left: 28px; padding: 5px 10px; border: 1px solid rgba(57,217,255,.35); border-radius: 999px; background: var(--night); color: var(--cyan); font: 700 .64rem/1 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .11em; }
-      .heroFigure img { width: 100%; border-radius: 12px; background: #fff; }
-      .caption { max-width: 850px; margin: 17px auto 0; color: #8194a2; font-size: .82rem; }
-      .summary { border-block: 1px solid rgba(141,188,219,.18); background: rgba(9,19,29,.72); }
+      .button.pending { color: #758997; cursor: default; }
+      .button.pending:hover { transform: none; }
+      .heroNote { margin: 17px 0 0; color: #647e90; font-size: .74rem; }
+
+      .summary { position: relative; z-index: 2; border-block: 1px solid rgba(141, 188, 219, .18); background: rgba(8, 20, 31, .88); }
       .summaryGrid { display: grid; grid-template-columns: repeat(3, 1fr); }
-      .summaryGrid > div { padding: 31px 34px; display: flex; flex-direction: column; gap: 3px; }
-      .summaryGrid > div + div { border-left: 1px solid rgba(141,188,219,.15); }
-      .stat { color: #fff; font-family: Georgia, serif; font-size: clamp(1.6rem, 2.8vw, 2.5rem); line-height: 1.1; }
+      .summaryGrid > div { padding: 28px 34px 31px; display: flex; flex-direction: column; gap: 4px; }
+      .summaryGrid > div + div { border-left: 1px solid rgba(141, 188, 219, .15); }
+      .stat { color: #fff; font-family: var(--serif); font-size: clamp(1.65rem, 2.8vw, 2.48rem); line-height: 1.1; }
       .stat em { color: var(--cyan); font-style: normal; }
-      .statLabel { color: #7f93a3; font-size: .8rem; }
+      .statLabel { color: #8297a7; font-size: .78rem; }
+
       section { padding-block: 112px; }
-      .heading { max-width: 850px; margin-bottom: 52px; }
-      .heading h2 { margin: 0; font-family: Georgia, "Times New Roman", serif; font-size: clamp(2.3rem, 4.8vw, 4.5rem); font-weight: 500; line-height: 1.06; letter-spacing: -.045em; }
-      .heading > p:last-child { max-width: 730px; margin: 20px 0 0; color: var(--muted); font-size: 1.02rem; }
-      .method { background: linear-gradient(180deg, #f4f7f9 0, #eaf1f6 100%); }
-      .methodStory { display: grid; gap: 54px; }
-      .methodPanel { display: flex; flex-direction: column; align-items: center; gap: 22px; }
-      .panelCopy { max-width: 780px; padding: 0 20px; text-align: center; }
-      .panelIndex { width: 37px; height: 37px; margin: 0 auto 15px; display: grid; place-items: center; border-radius: 10px; background: #e4f8ff; color: #08799e; font: 780 .78rem/1 ui-monospace, monospace; }
-      .panelCopy h3 { margin: 0; font-size: 1.25rem; letter-spacing: -.02em; }
-      .panelCopy p { margin: 10px 0 0; color: var(--muted); font-size: .9rem; }
-      .methodPanel figure { width: 100%; margin: 0; overflow: hidden; background: transparent; }
-      .methodPanel img { width: 100%; margin-inline: auto; object-fit: contain; }
-      .formulaDeck { display: grid; grid-template-columns: 1.45fr .8fr .8fr; gap: 14px; }
-      .formulaCard { position: relative; min-height: 150px; padding: 25px; overflow: hidden; border: 1px solid rgba(85,139,177,.26); border-radius: 18px; background: #081522; color: #edf9ff; box-shadow: 0 18px 45px rgba(15,46,69,.14); }
-      .formulaCard::after { content: ""; position: absolute; right: -48px; bottom: -80px; width: 180px; height: 180px; border-radius: 50%; background: radial-gradient(circle, rgba(57,217,255,.22), transparent 68%); }
-      .formulaTag { color: var(--cyan); font: 720 .65rem/1 ui-monospace, monospace; letter-spacing: .13em; text-transform: uppercase; }
-      .equation { position: relative; z-index: 1; margin-top: 22px; color: #fff; font-family: Georgia, "Times New Roman", serif; font-size: clamp(1.15rem, 2.15vw, 1.75rem); line-height: 1.45; }
-      .equation sub, .equation sup { font-size: .6em; }
-      .formulaNote { margin-top: 12px; color: #8ea4b5; font-size: .78rem; }
-      .results { background: #fff; }
-      .paperFigure { margin: 0; padding: 22px; border: 1px solid #d4dfe7; border-radius: 20px; background: #fff; box-shadow: 0 20px 62px rgba(30,65,91,.09); }
-      .paperFigure img { width: 100%; }
-      .demos { color: #eaf6ff; background: var(--night); background-image: radial-gradient(circle at 100% 30%, rgba(39,134,255,.2), transparent 30rem), linear-gradient(rgba(57,217,255,.028) 1px, transparent 1px), linear-gradient(90deg, rgba(57,217,255,.028) 1px, transparent 1px); background-size: auto, 64px 64px, 64px 64px; }
-      .demos .heading > p:last-child { color: #8ea3b3; }
-      .demoNav { margin-bottom: 18px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-      .demoTab { min-height: 74px; padding: 13px 15px; border: 1px solid rgba(105,165,205,.2); border-radius: 13px; background: rgba(13,26,40,.68); color: #8297a8; text-align: left; cursor: pointer; transition: border-color .18s ease, background .18s ease, color .18s ease, transform .18s ease; }
-      .demoTab:hover { border-color: rgba(57,217,255,.48); color: #d9f7ff; transform: translateY(-2px); }
-      .demoTab[aria-selected="true"] { border-color: rgba(57,217,255,.6); background: linear-gradient(145deg, rgba(17,67,91,.88), rgba(10,34,53,.9)); color: #f1fcff; box-shadow: 0 0 28px rgba(57,217,255,.1); }
-      .demoTab span { display: block; margin-bottom: 7px; color: var(--cyan); font: 760 .62rem/1 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .1em; }
+      .heading { max-width: 850px; margin-bottom: 48px; }
+      .heading h2 { margin: 0; font-family: var(--serif); font-size: clamp(2.35rem, 4.8vw, 4.55rem); font-weight: 500; line-height: 1.05; letter-spacing: -.046em; }
+      .heading > p:last-child { max-width: 730px; margin: 19px 0 0; color: var(--muted); font-size: 1rem; }
+
+      .demos { color: #eaf6ff; background: var(--night); background-image: radial-gradient(circle at 100% 20%, rgba(39, 134, 255, .19), transparent 31rem), linear-gradient(rgba(64, 223, 255, .028) 1px, transparent 1px), linear-gradient(90deg, rgba(64, 223, 255, .028) 1px, transparent 1px); background-size: auto, 64px 64px, 64px 64px; }
+      .demos .heading { margin-bottom: 37px; }
+      .demos .heading > p:last-child { color: #91a6b5; }
+      .demoNav { margin-bottom: 14px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+      .demoTab { min-height: 76px; padding: 13px 15px; border: 1px solid rgba(105, 165, 205, .2); border-radius: 13px; background: rgba(13, 26, 40, .68); color: #8398a8; text-align: left; cursor: pointer; transition: border-color .18s ease, background .18s ease, color .18s ease, transform .18s ease; }
+      .demoTab:hover { border-color: rgba(64, 223, 255, .48); color: #d9f7ff; transform: translateY(-2px); }
+      .demoTab[aria-selected="true"] { border-color: rgba(64, 223, 255, .62); background: linear-gradient(145deg, rgba(17, 67, 91, .9), rgba(10, 34, 53, .92)); color: #f1fcff; box-shadow: 0 0 28px rgba(64, 223, 255, .1); }
+      .demoTab span { display: block; margin-bottom: 7px; color: var(--cyan); font: 760 .61rem/1 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .1em; }
       .demoTab strong { font-size: .82rem; line-height: 1.25; }
-      .demoStack { min-height: 610px; }
-      .demo { display: none; overflow: hidden; border: 1px solid rgba(105,165,205,.28); border-radius: 21px; background: linear-gradient(140deg, rgba(17,31,46,.92), rgba(7,15,25,.95)); box-shadow: 0 28px 80px rgba(0,0,0,.28); }
-      .demo.is-active { display: block; animation: demoReveal .28s ease-out; }
+      .demo { display: none; overflow: hidden; border: 1px solid rgba(105, 165, 205, .28); border-radius: 21px; background: linear-gradient(140deg, rgba(17, 31, 46, .94), rgba(7, 15, 25, .97)); box-shadow: 0 28px 80px rgba(0, 0, 0, .28); }
+      .demo.isActive { display: block; animation: demoReveal .28s ease-out; }
       @keyframes demoReveal { from { opacity: .35; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-      .demoCopy { padding: 29px 32px 24px; display: grid; grid-template-columns: .78fr 1.6fr; column-gap: 38px; }
+      .demoCopy { padding: 28px 31px 23px; display: grid; grid-template-columns: .78fr 1.6fr; column-gap: 38px; }
       .demoCopy .eyebrow { grid-row: 1 / span 2; }
-      .demoCopy h3 { margin: 0; font-family: Georgia, serif; font-size: clamp(1.55rem, 3vw, 2.4rem); font-weight: 500; line-height: 1.08; letter-spacing: -.03em; }
-      .demoCopy > p:last-child { margin: 12px 0 0; color: #8ea3b3; font-size: .88rem; }
-      .videos { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: rgba(101,148,180,.25); }
+      .demoCopy h3 { margin: 0; font-family: var(--serif); font-size: clamp(1.55rem, 3vw, 2.42rem); font-weight: 500; line-height: 1.08; letter-spacing: -.03em; }
+      .demoCopy > p:last-child { margin: 12px 0 0; color: #8ea3b3; font-size: .87rem; }
+      .videos { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: rgba(101, 148, 180, .25); }
       .videos figure { margin: 0; background: #08111b; }
       .videoShell { position: relative; background: #020508; }
-      .videoShell video { width: 100%; aspect-ratio: 832/480; background: #020508; }
-      .label { position: absolute; top: 13px; left: 13px; padding: 6px 10px; border: 1px solid rgba(255,255,255,.14); border-radius: 7px; background: rgba(5,12,19,.76); color: #fff; font-size: .72rem; font-weight: 750; backdrop-filter: blur(10px); pointer-events: none; }
-      .label.tm { border-color: rgba(57,217,255,.42); background: rgba(10,92,120,.82); color: #dcfaff; }
-      .videos figcaption { padding: 11px 14px 13px; color: #7f94a4; font-size: .74rem; }
-      .pairControls { padding: 13px 15px; display: flex; justify-content: center; border-top: 1px solid rgba(101,148,180,.2); }
-      .syncButton { min-height: 39px; padding: 8px 16px; border: 1px solid rgba(57,217,255,.38); border-radius: 999px; background: rgba(11,50,70,.72); color: #dffaff; font: 720 .76rem/1 ui-sans-serif, sans-serif; letter-spacing: .02em; cursor: pointer; }
-      .syncButton:hover { border-color: var(--cyan); box-shadow: 0 0 22px rgba(57,217,255,.12); }
+      .videoShell video { width: 100%; aspect-ratio: 832 / 480; background: #020508; }
+      .label { position: absolute; top: 13px; left: 13px; padding: 6px 10px; border: 1px solid rgba(255, 255, 255, .14); border-radius: 7px; background: rgba(5, 12, 19, .78); color: #fff; font-size: .7rem; font-weight: 760; backdrop-filter: blur(10px); pointer-events: none; }
+      .label.tm { border-color: rgba(64, 223, 255, .42); background: rgba(10, 92, 120, .84); color: #dcfaff; }
+      .videos figcaption { padding: 10px 14px 12px; color: #8095a5; font-size: .72rem; }
+      .pairControls { padding: 15px 17px; display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 18px; border-top: 1px solid rgba(101, 148, 180, .2); }
+      .syncButton { min-height: 42px; padding: 9px 16px; border: 1px solid rgba(64, 223, 255, .4); border-radius: 999px; background: rgba(11, 50, 70, .76); color: #dffaff; font: 730 .75rem/1 ui-sans-serif, sans-serif; cursor: pointer; }
+      .syncButton:hover { border-color: var(--cyan); box-shadow: 0 0 22px rgba(64, 223, 255, .12); }
+      .timeline { min-width: 0; display: grid; grid-template-columns: auto minmax(100px, 1fr) auto; align-items: center; gap: 12px; color: #7f96a7; font-size: .7rem; }
+      .timeline input { width: 100%; accent-color: var(--cyan); cursor: pointer; }
+      .timeline output { min-width: 76px; color: #aec2cf; font: .68rem/1 ui-monospace, SFMono-Regular, Menlo, monospace; text-align: right; }
+
+      .problem { background: #f8fafb; }
+      .problemLead { display: grid; grid-template-columns: .95fr 1.25fr; gap: 80px; align-items: end; }
+      .problemLead .heading { margin: 0; }
+      .thesisCard { padding: 29px 31px; border-left: 3px solid #159dc9; background: #eaf7fb; color: #224352; font-family: var(--serif); font-size: clamp(1.32rem, 2.2vw, 1.9rem); line-height: 1.36; }
+      .failureGrid { margin-top: 50px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+      .failureCard { min-height: 240px; padding: 24px; display: flex; flex-direction: column; border: 1px solid #d6e1e8; border-radius: 17px; background: #fff; box-shadow: 0 14px 36px rgba(30, 65, 91, .05); }
+      .failureCard.tether { border-color: rgba(20, 151, 193, .45); background: linear-gradient(150deg, #eefbff, #fff); }
+      .failureIcon { width: 39px; height: 39px; display: grid; place-items: center; border-radius: 10px; background: #edf2f5; color: #687d8d; font: 760 .72rem/1 ui-monospace, monospace; }
+      .failureCard.tether .failureIcon { background: #d8f7ff; color: #087da5; }
+      .failureCard h3 { margin: 22px 0 8px; font-size: 1.03rem; letter-spacing: -.02em; }
+      .failureCard p { margin: 0; color: var(--muted); font-size: .83rem; }
+      .failureTag { margin-top: auto; padding-top: 23px; color: #8c5c4a; font: 720 .65rem/1.35 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .05em; text-transform: uppercase; }
+      .failureCard.tether .failureTag { color: #0783aa; }
+      .paperDisclosure { margin-top: 27px; overflow: hidden; border: 1px solid #d4dfe6; border-radius: 17px; background: #fff; }
+      .paperDisclosure summary { padding: 20px 23px; display: flex; align-items: center; justify-content: space-between; gap: 20px; color: #1e394a; font-weight: 760; cursor: pointer; list-style: none; }
+      .paperDisclosure summary::-webkit-details-marker { display: none; }
+      .paperDisclosure summary::after { content: "+"; width: 29px; height: 29px; display: grid; place-items: center; border-radius: 50%; background: #eaf3f8; color: #087da5; font-size: 1.1rem; }
+      .paperDisclosure[open] summary::after { content: "−"; }
+      .disclosureBody { padding: 0 17px 18px; }
+      .disclosureBody img { width: 100%; border: 1px solid #e0e8ed; border-radius: 11px; background: #fff; }
+      .caption { max-width: 900px; margin: 14px auto 0; color: #738392; font-size: .78rem; }
+
+      .method { background: linear-gradient(180deg, var(--paper-blue), #f2f6f8); }
+      .routingExplorer { overflow: hidden; border: 1px solid rgba(72, 130, 169, .28); border-radius: 22px; background: #071521; color: #edf9ff; box-shadow: 0 24px 68px rgba(24, 62, 88, .15); }
+      .routeToolbar { padding: 18px 20px; display: flex; align-items: center; justify-content: space-between; gap: 18px; border-bottom: 1px solid rgba(132, 180, 211, .17); background: rgba(11, 30, 45, .9); }
+      .routeToolbar > span { color: #849baa; font: 710 .65rem/1 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .1em; text-transform: uppercase; }
+      .routeTabs { padding: 4px; display: inline-flex; gap: 4px; border: 1px solid rgba(132, 180, 211, .18); border-radius: 999px; background: #06101a; }
+      .routeTab { min-height: 37px; padding: 8px 15px; border: 0; border-radius: 999px; background: transparent; color: #8298a8; font-size: .75rem; font-weight: 760; cursor: pointer; }
+      .routeTab[aria-selected="true"] { background: linear-gradient(135deg, #176487, #18476e); color: #fff; box-shadow: 0 0 20px rgba(64, 223, 255, .13); }
+      .routeDiagram { min-height: 340px; padding: 46px 37px 34px; display: grid; grid-template-columns: .78fr auto 1.4fr auto 1fr; align-items: center; gap: 24px; background-image: radial-gradient(circle at 55% 48%, rgba(39, 134, 255, .13), transparent 27rem), linear-gradient(rgba(64, 223, 255, .025) 1px, transparent 1px), linear-gradient(90deg, rgba(64, 223, 255, .025) 1px, transparent 1px); background-size: auto, 34px 34px, 34px 34px; }
+      .routeNode { min-height: 155px; padding: 23px; display: flex; flex-direction: column; justify-content: center; border: 1px solid rgba(127, 175, 207, .2); border-radius: 16px; background: rgba(13, 31, 46, .84); }
+      .routeNode > span, .memoryMeta span { color: #738c9d; font: 700 .62rem/1 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .11em; text-transform: uppercase; }
+      .routeNode strong { margin-top: 11px; font-family: var(--serif); font-size: 1.35rem; font-weight: 500; line-height: 1.15; }
+      .routeNode small { margin-top: 11px; color: #8197a7; font-size: .73rem; }
+      .queryNode { border-color: rgba(64, 223, 255, .35); }
+      .readoutNode { border-color: rgba(139, 115, 255, .38); }
+      .routeArrow { color: var(--cyan); font-size: 1.3rem; opacity: .72; }
+      .memoryBank { min-height: 220px; padding: 22px 22px 18px; border: 1px solid rgba(127, 175, 207, .2); border-radius: 18px; background: rgba(9, 25, 39, .9); }
+      .memoryMeta { display: flex; align-items: baseline; justify-content: space-between; gap: 18px; }
+      .memoryMeta strong { color: #b6cbd7; font-size: .75rem; }
+      .memoryCells { height: 133px; margin-top: 19px; padding: 11px 10px 0; display: grid; grid-template-columns: repeat(5, 1fr); align-items: end; gap: 8px; border-bottom: 1px solid rgba(132, 180, 211, .22); }
+      .memoryCell { height: 110px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 8px; }
+      .memoryCell i { width: min(100%, 42px); height: var(--subject); display: block; border: 1px solid rgba(64, 223, 255, .4); border-radius: 7px 7px 2px 2px; background: linear-gradient(180deg, rgba(64, 223, 255, .82), rgba(39, 134, 255, .32)); box-shadow: 0 0 16px rgba(64, 223, 255, .08); transition: height .32s ease, background .32s ease, border-color .32s ease; }
+      .memoryCell small { color: #6f8798; font: .62rem/1 ui-monospace, monospace; }
+      [data-routing-mode="scene"] .memoryCell i { height: var(--scene); border-color: rgba(139, 115, 255, .45); background: linear-gradient(180deg, rgba(139, 115, 255, .88), rgba(39, 134, 255, .28)); }
+      .routeLegend { padding: 0 37px 29px; display: flex; justify-content: space-between; gap: 24px; color: #6f8798; font-size: .7rem; }
+      .routeLegend b { color: #9db3c1; font-weight: 680; }
+
+      .formulaDeck { margin-top: 18px; display: grid; grid-template-columns: 1.45fr .8fr .8fr; gap: 12px; }
+      .formulaCard { position: relative; min-height: 150px; padding: 24px; overflow: hidden; border: 1px solid rgba(85, 139, 177, .26); border-radius: 17px; background: #fff; color: #163044; box-shadow: 0 13px 38px rgba(24, 62, 88, .07); }
+      .formulaCard::after { content: ""; position: absolute; right: -48px; bottom: -80px; width: 180px; height: 180px; border-radius: 50%; background: radial-gradient(circle, rgba(64, 223, 255, .18), transparent 68%); }
+      .formulaTag { color: #087da5; font: 730 .64rem/1 ui-monospace, monospace; letter-spacing: .13em; text-transform: uppercase; }
+      .equation { position: relative; z-index: 1; margin-top: 21px; font-family: var(--serif); font-size: clamp(1.12rem, 2.1vw, 1.7rem); line-height: 1.45; }
+      .equation sub, .equation sup { font-size: .6em; }
+      .formulaNote { margin: 11px 0 0; color: #708190; font-size: .76rem; }
+      .methodStory { margin-top: 50px; display: grid; gap: 18px; }
+      .methodPanel { overflow: hidden; border: 1px solid #d4e0e7; border-radius: 20px; background: #fff; box-shadow: 0 20px 55px rgba(24, 62, 88, .08); }
+      .panelCopy { padding: 28px 31px 23px; display: grid; grid-template-columns: auto 1fr; column-gap: 18px; }
+      .panelIndex { width: 39px; height: 39px; grid-row: 1 / span 2; display: grid; place-items: center; border-radius: 10px; background: #e3f7fc; color: #08799e; font: 780 .75rem/1 ui-monospace, monospace; }
+      .panelCopy h3 { margin: 0; font-size: 1.17rem; letter-spacing: -.02em; }
+      .panelCopy p { margin: 7px 0 0; color: var(--muted); font-size: .84rem; }
+      .methodPanel figure { margin: 0; padding: 0 15px 15px; }
+      .methodPanel img { width: 100%; }
+      .methodDetails { overflow: hidden; border: 1px solid #d4e0e7; border-radius: 18px; background: rgba(255, 255, 255, .72); }
+      .methodDetails summary { padding: 19px 22px; display: flex; align-items: center; justify-content: space-between; gap: 20px; color: #294354; font-weight: 750; cursor: pointer; list-style: none; }
+      .methodDetails summary::-webkit-details-marker { display: none; }
+      .methodDetails summary::after { content: "Open figure +"; color: #087da5; font: 700 .67rem/1 ui-monospace, monospace; letter-spacing: .04em; }
+      .methodDetails[open] summary::after { content: "Close figure −"; }
+      .methodDetails figure { margin: 0; padding: 0 15px 15px; }
+
+      .results { background: #fff; }
+      .evidenceIntro { display: grid; grid-template-columns: 1fr auto; align-items: end; gap: 40px; }
+      .evidenceIntro .heading { margin-bottom: 0; }
+      .evidenceBadge { padding: 16px 20px; border: 1px solid #cfe2eb; border-radius: 14px; background: #f0faff; }
+      .evidenceBadge strong { display: block; color: #087da5; font-family: var(--serif); font-size: 1.8rem; line-height: 1; }
+      .evidenceBadge span { display: block; margin-top: 7px; color: #667c8b; font-size: .7rem; }
+      .paperFigure { margin: 47px 0 0; padding: 21px; border: 1px solid #d4dfe7; border-radius: 20px; background: #fff; box-shadow: 0 20px 62px rgba(30, 65, 91, .09); }
+      .paperFigure img { width: 100%; }
+
       .trajectories { background: #e9f0f5; }
-      .trajectory { padding: 14px; border-radius: 18px; background: #fff; box-shadow: 0 20px 60px rgba(31,65,89,.11); }
+      .trajectory { padding: 14px; border-radius: 18px; background: #fff; box-shadow: 0 20px 60px rgba(31, 65, 89, .11); }
       .trajectory img { width: 100%; }
-      .citation { display: grid; grid-template-columns: .75fr 1.25fr; gap: 56px; align-items: start; }
-      .bibtex { margin: 0; padding: 28px; overflow-x: auto; border: 1px solid #ccd9e2; border-radius: 16px; background: #07131e; color: #b8d8e9; font: .78rem/1.7 ui-monospace, SFMono-Regular, Menlo, monospace; white-space: pre-wrap; box-shadow: 0 20px 50px rgba(20,53,78,.12); }
-      footer { padding: 46px 0; border-top: 1px solid #d4dfe6; background: #fff; }
+
+      .citationSection { background: #f8fafb; }
+      .citationGrid { display: grid; grid-template-columns: .75fr 1.25fr; gap: 56px; align-items: start; }
+      .citationGrid .heading { margin: 0; }
+      .bibCard { overflow: hidden; border: 1px solid #ccd9e2; border-radius: 17px; background: #07131e; box-shadow: 0 20px 50px rgba(20, 53, 78, .12); }
+      .bibToolbar { min-height: 55px; padding: 10px 12px 10px 20px; display: flex; align-items: center; justify-content: space-between; gap: 16px; border-bottom: 1px solid rgba(143, 187, 214, .15); color: #6f8b9d; font: .66rem/1 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .08em; }
+      .copyButton { min-height: 35px; padding: 7px 12px; border: 1px solid rgba(64, 223, 255, .35); border-radius: 999px; background: rgba(17, 58, 79, .72); color: #dffaff; font-size: .7rem; font-weight: 740; cursor: pointer; }
+      .copyButton:hover { border-color: var(--cyan); }
+      .bibtex { margin: 0; padding: 25px 27px 28px; overflow-x: auto; color: #b8d8e9; font: .76rem/1.72 ui-monospace, SFMono-Regular, Menlo, monospace; white-space: pre-wrap; }
+      .copyStatus { min-height: 19px; margin: 9px 0 0; color: #667c8b; font-size: .74rem; }
+
+      footer { padding: 45px 0; border-top: 1px solid #d4dfe6; background: #fff; }
       .footerGrid { display: flex; align-items: center; justify-content: space-between; gap: 30px; }
-      .brand { display: flex; align-items: center; gap: 24px; }
-      .brand img { width: auto; height: 38px; object-fit: contain; }
-      .footerGrid p { margin: 8px 0 0; color: var(--muted); font-size: .8rem; }
-      @media (max-width: 820px) {
-        .navlinks { display: none; }
-        .hero { padding-top: 64px; }
-        .hero h1 { font-size: clamp(3rem, 15vw, 4.8rem); }
-        .summaryGrid, .formulaDeck, .videos, .citation { grid-template-columns: 1fr; }
-        .demoNav { grid-template-columns: 1fr 1fr; }
-        .demoStack { min-height: 0; }
-        .summaryGrid > div { padding: 22px 0; }
-        .summaryGrid > div + div { border-left: 0; border-top: 1px solid rgba(141,188,219,.15); }
-        section { padding-block: 78px; }
-        .methodPanel { gap: 16px; }
-        .panelCopy { padding: 8px 6px 0; }
-        .demoCopy { grid-template-columns: 1fr; }
-        .demoCopy .eyebrow { grid-row: auto; }
-        .footerGrid { align-items: flex-start; flex-direction: column; }
+      footer .wordmark { color: #10202e; }
+      footer .mark { box-shadow: none; }
+      .brand { display: flex; align-items: center; gap: 23px; }
+      .brand img { width: auto; height: 37px; object-fit: contain; }
+      .footerGrid p { margin: 8px 0 0; color: var(--muted); font-size: .78rem; }
+
+      @media (max-width: 960px) {
+        .problemLead { grid-template-columns: 1fr; gap: 28px; }
+        .failureGrid { grid-template-columns: 1fr 1fr; }
+        .routeDiagram { grid-template-columns: 1fr; gap: 15px; }
+        .routeArrow { transform: rotate(90deg); justify-self: center; }
+        .routeNode, .memoryBank { width: 100%; min-height: 0; }
+        .evidenceIntro { grid-template-columns: 1fr; }
+        .evidenceBadge { justify-self: start; }
       }
-      @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+      @media (max-width: 760px) {
+        .shell { width: min(calc(100% - 30px), var(--max)); }
+        .navWrap { padding-top: 9px; }
+        .topbar { min-height: 53px; padding-left: 11px; border-radius: 15px; }
+        .navlinks { display: none; }
+        .navCta { min-height: 35px; padding-inline: 12px; }
+        .hero { min-height: 0; padding: 116px 0 72px; }
+        .labLockup { margin-bottom: 28px; }
+        .hero h1 { font-size: clamp(3rem, 15vw, 4.85rem); }
+        .summaryGrid, .formulaDeck, .videos, .citationGrid { grid-template-columns: 1fr; }
+        .summaryGrid > div { padding: 21px 0; }
+        .summaryGrid > div + div { border-left: 0; border-top: 1px solid rgba(141, 188, 219, .15); }
+        section { padding-block: 78px; }
+        .heading { margin-bottom: 36px; }
+        .demoNav { grid-template-columns: 1fr 1fr; }
+        .demoTab { min-height: 71px; padding: 12px; }
+        .demoCopy { padding: 24px 20px 20px; grid-template-columns: 1fr; }
+        .demoCopy .eyebrow { grid-row: auto; }
+        .pairControls { grid-template-columns: 1fr; gap: 13px; }
+        .timeline { grid-template-columns: 1fr auto; }
+        .timeline > span { display: none; }
+        .failureGrid { grid-template-columns: 1fr; }
+        .failureCard { min-height: 210px; }
+        .routeToolbar { align-items: flex-start; flex-direction: column; }
+        .routeTabs { width: 100%; }
+        .routeTab { flex: 1; }
+        .routeDiagram { padding: 28px 20px; }
+        .routeLegend { padding-inline: 20px; flex-direction: column; gap: 6px; }
+        .panelCopy { padding: 23px 20px 19px; }
+        .paperFigure { padding: 10px; }
+        .citationGrid { gap: 31px; }
+        .footerGrid { align-items: flex-start; flex-direction: column; }
+        .brand img { height: 31px; }
+      }
+
+      @media (max-width: 430px) {
+        .wordmark { font-size: .91rem; }
+        .labLockup { max-width: 100%; gap: 8px; font-size: .61rem; }
+        .labLockup img { height: 19px; }
+        .labLockup img:last-of-type { height: 16px; }
+        .demoNav { grid-template-columns: 1fr; }
+        .authors { font-size: .84rem; }
+        .affiliations { font-size: .77rem; }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        html { scroll-behavior: auto; }
+        *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+      }
     </style>
   </head>
   <body>
-    <div class="dark-surface">
-      <nav class="shell" aria-label="Primary navigation">
+    <a class="skipLink" href="#main">Skip to content</a>
+
+    <div class="navWrap">
+      <nav class="topbar shell" aria-label="Primary navigation">
         <a class="wordmark" href="#top"><span class="mark">T</span><span>TetherMem</span></a>
-        <div class="navlinks"><a href="#method">Method</a><a href="#results">Results</a><a href="#demos">Demos</a><a href="#citation">Citation</a></div>
+        <div class="navlinks"><a href="#demo">Demo</a><a href="#problem">Problem</a><a href="#method">Method</a><a href="#evidence">Evidence</a><a href="#citation">Citation</a></div>
+        <a class="navCta" href="assets/paper/tethermem-paper.pdf">Paper ↗</a>
       </nav>
-
-      <header class="hero shell" id="top">
-        <p class="kicker">Long-horizon autoregressive video generation</p>
-        <h1>Tether the Subject,<br /><span>Release the Scene.</span></h1>
-        <p class="subtitle">Query-aware memory routing preserves identity-bearing history while allowing backgrounds, viewpoints, and scene states to keep evolving.</p>
-        <div class="authors" aria-label="Authors and affiliations">
-          <div class="authorNames">
-            <span>Chen Li<sup>1,2</sup></span><span>Peng Zhang<sup>2</sup></span><span>Hanyu Zhou<sup>1</sup></span><span>Jialong Zuo<sup>1</sup></span>
-            <span>Fei Wang<sup>2</sup></span><span>Daiguo Zhou<sup>2</sup></span><span>Nong Sang<sup>1</sup></span><span>Changxin Gao<sup>1,*</sup></span>
-          </div>
-          <div class="affiliations"><span><sup>1</sup>Huazhong University of Science and Technology</span><span><sup>2</sup>MiLM Plus, Xiaomi Inc.</span><span><sup>*</sup>Corresponding author</span></div>
-        </div>
-        <div class="actions">
-          <a class="button primary" href="assets/paper/tethermem-paper.pdf">Read the paper ↗</a>
-          <span class="button pending">arXiv · coming soon</span><span class="button pending">Code · coming soon</span>
-        </div>
-        <figure class="heroFigure"><img src="assets/figures/figure1.png" alt="Figure 1: four 120-second video trajectories comparing Rolling Forcing, Deep Forcing, LongLive-RAG, and TetherMem" /></figure>
-        <p class="caption">Figure 1. A shared 120-second timeline exposes distinct failure modes: stagnation, incoherent motion, limited progression, and sustained scene evolution.</p>
-      </header>
-
-      <div class="summary"><div class="shell summaryGrid">
-        <div><span class="stat"><em>2,400</em></span><span class="statLabel">blinded pairwise judgments</span></div>
-        <div><span class="stat"><em>0.769</em></span><span class="statLabel">scene-progression expected preference</span></div>
-        <div><span class="stat">Training-free</span><span class="statLabel">inference-time routing on a frozen generator</span></div>
-      </div></div>
     </div>
 
-    <section class="method" id="method"><div class="shell">
-      <div class="heading"><p class="eyebrow">Method</p><h2>Route memory at the query level.</h2><p>TetherMem places a positive spatiotemporal routing prior inside attention normalization. Subject queries retain identity-bearing history; scene queries preferentially read recent background states.</p></div>
+    <main id="main">
+      <div class="darkSurface">
+        <header class="hero shell" id="top">
+          <div class="labLockup" aria-label="HUST and MiLM Plus, Xiaomi Inc.">
+            <img src="assets/brand/hust.png" alt="" /><span>HUST</span><span class="plus">×</span><img src="assets/brand/xiaomi.png" alt="" /><span>MiLM Plus</span>
+          </div>
+          <p class="kicker">Long-horizon autoregressive video generation</p>
+          <h1>Tether the Subject,<br /><span>Release the Scene.</span></h1>
+          <p class="subtitle">Query-aware memory routing preserves identity-bearing history while allowing backgrounds, viewpoints, and scene states to keep evolving.</p>
+          <div class="authors" aria-label="Authors and affiliations">
+            <div class="authorNames">
+              <span>Chen Li<sup>1,2</sup></span><span>Peng Zhang<sup>2</sup></span><span>Hanyu Zhou<sup>1</sup></span><span>Jialong Zuo<sup>1</sup></span>
+              <span>Fei Wang<sup>2</sup></span><span>Daiguo Zhou<sup>2</sup></span><span>Nong Sang<sup>1</sup></span><span>Changxin Gao<sup>1,*</sup></span>
+            </div>
+            <div class="affiliations"><span><sup>1</sup>Huazhong University of Science and Technology</span><span><sup>2</sup>MiLM Plus, Xiaomi Inc.</span><span><sup>*</sup>Corresponding author</span></div>
+          </div>
+          <div class="actions">
+            <a class="button primary" href="assets/paper/tethermem-paper.pdf">Read the paper ↗</a>
+            <span class="button pending">arXiv · coming soon</span><span class="button pending">Code · coming soon</span>
+          </div>
+          <p class="heroNote">Training-free · frozen video generator · inference-time intervention</p>
+        </header>
 
-      <div class="formulaDeck" aria-label="Core routing equations">
-        <article class="formulaCard"><span class="formulaTag">Normalized routing</span><div class="equation">Ã<sub>q,i</sub> = softmax(s<sub>q,i</sub> + log π<sub>n</sub>(q,i))</div><p class="formulaNote">The prior changes selection while attention remains normalized.</p></article>
-        <article class="formulaCard"><span class="formulaTag">Region prior</span><div class="equation">π<sub>reg</sub> = 1<br />or γ<sub>n</sub></div><p class="formulaNote">Same-region paths stay open; cross-region reads are softened.</p></article>
-        <article class="formulaCard"><span class="formulaTag">Recency prior</span><div class="equation">ρ<sub>i</sub> = max(τ<sub>i</sub>, ρ<sub>min</sub>)</div><p class="formulaNote">Background queries favor recent scene states.</p></article>
+        <div class="summary"><div class="shell summaryGrid">
+          <div><span class="stat"><em>2,400</em></span><span class="statLabel">blinded pairwise judgments</span></div>
+          <div><span class="stat"><em>76.9%</em></span><span class="statLabel">scene-progression expected preference</span></div>
+          <div><span class="stat">Training-free</span><span class="statLabel">inference-time routing on a frozen generator</span></div>
+        </div></div>
       </div>
 
-      <div class="methodStory">
-        <article class="methodPanel">
-          <div class="panelCopy"><span class="panelIndex">02A</span><h3>End-to-end routing</h3><p>Current queries, retrieved history, and a time-aligned subject track meet at normalized memory routing. The subject is tethered; the scene is released.</p></div>
-          <figure><img src="assets/figures/method-a-cropped.png" alt="Figure 2a: end-to-end TetherMem architecture and qualitative scene outcomes" /></figure>
-        </article>
-        <article class="methodPanel">
-          <div class="panelCopy"><span class="panelIndex">02B</span><h3>From frame selection to query routing</h3><p>Frame-level selection decides which memories survive. TetherMem instead routes subject and scene queries differently within the same retrieved budget.</p></div>
-          <figure><img src="assets/figures/method-b-cropped.png" alt="Figure 2b: comparison between prior frame-level memory selection and TetherMem query-conditioned routing" /></figure>
-        </article>
-      </div>
-    </div></section>
+      <section class="demos" id="demo"><div class="shell">
+        <div class="heading"><p class="eyebrow">See the effect first</p><h2>Watch the trajectory—not only the last frame.</h2><p>Four matched 30-second comparisons expose distinct long-horizon behaviors. Choose a scene, then use the shared timeline to compare both streams at exactly the same moment.</p></div>
+        <div class="demoNav" role="tablist" aria-label="Choose a qualitative comparison">
+          <button class="demoTab" type="button" role="tab" id="tab-p07" aria-selected="true" aria-controls="demo-p07" data-demo-target="demo-p07"><span>01 · PROGRESSION</span><strong>Flower market</strong></button>
+          <button class="demoTab" type="button" role="tab" id="tab-p01" aria-selected="false" aria-controls="demo-p01" data-demo-target="demo-p01"><span>02 · STABILITY</span><strong>Fisherman harbor</strong></button>
+          <button class="demoTab" type="button" role="tab" id="tab-p03" aria-selected="false" aria-controls="demo-p03" data-demo-target="demo-p03"><span>03 · IDENTITY</span><strong>Dog in park</strong></button>
+          <button class="demoTab" type="button" role="tab" id="tab-p04" aria-selected="false" aria-controls="demo-p04" data-demo-target="demo-p04"><span>04 · TRANSFER</span><strong>Tokyo woman</strong></button>
+        </div>
 
-    <section class="results" id="results"><div class="shell">
-      <div class="heading"><p class="eyebrow">Evidence</p><h2>Identity and progression can coexist.</h2><p>Human preference distinguishes coherent scene development from raw motion. TetherMem occupies the high-identity, high-progression region, while strong motion alone is not sufficient.</p></div>
-      <figure class="paperFigure"><img src="assets/figures/evidence-landscape.png" alt="Scatter plots comparing identity, scene progression, and normalized translation across video methods" /></figure>
-    </div></section>
+        <div class="demoStack">
+          <article class="demo isActive" id="demo-p07" role="tabpanel" aria-labelledby="tab-p07">
+            <div class="demoCopy"><p class="eyebrow">30 seconds · P07 flower vendor</p><h3>A sideways track should leave the opening composition.</h3><p>Rolling-Forcing stays close to the opening flower stall. TetherMem reveals new stalls, pedestrians, and street context while keeping the vendor identifiable.</p></div>
+            <div class="videos">
+              <figure><div class="videoShell"><video controls playsinline preload="metadata" data-sync="p07-30" poster="assets/videos/p07-rolling-forcing-poster.jpg"><source src="assets/videos/p07-rolling-forcing.mp4" type="video/mp4" /></video><span class="label">Rolling-Forcing</span></div><figcaption>Opening composition remains dominant</figcaption></figure>
+              <figure><div class="videoShell"><video controls playsinline preload="metadata" data-sync="p07-30" poster="assets/videos/p07-tethermem-poster.jpg"><source src="assets/videos/p07-tethermem.mp4" type="video/mp4" /></video><span class="label tm">TetherMem</span></div><figcaption>Same P07 prompt and seed · independent 30-second rollout</figcaption></figure>
+            </div>
+            <div class="pairControls" data-sync-controls="p07-30"><button class="syncButton" type="button" data-pair="p07-30">Play both</button><label class="timeline"><span>Shared timeline</span><input type="range" min="0" max="30" step="0.05" value="0" data-scrubber="p07-30" aria-label="Shared timeline for the flower market comparison" /><output data-time="p07-30">0:00 / 0:30</output></label></div>
+          </article>
 
-    <section class="demos" id="demos"><div class="shell">
-      <div class="heading"><p class="eyebrow">Interactive demos</p><h2>Watch the trajectory—not only the last frame.</h2><p>Four matched 30-second comparisons show distinct long-horizon behaviors without loading a 120-second file. Choose a scene, then play both streams from the same time.</p></div>
-      <div class="demoNav" role="tablist" aria-label="Choose a qualitative comparison">
-        <button class="demoTab" type="button" role="tab" aria-selected="false" aria-controls="demo-p07" data-demo-target="demo-p07"><span>01 · CAMERA MOTION</span><strong>Flower market</strong></button>
-        <button class="demoTab" type="button" role="tab" aria-selected="false" aria-controls="demo-p01" data-demo-target="demo-p01"><span>02 · STABILITY</span><strong>Fisherman harbor</strong></button>
-        <button class="demoTab" type="button" role="tab" aria-selected="false" aria-controls="demo-p03" data-demo-target="demo-p03"><span>03 · IDENTITY</span><strong>Dog in park</strong></button>
-        <button class="demoTab" type="button" role="tab" aria-selected="true" aria-controls="demo-p04" data-demo-target="demo-p04"><span>04 · TRANSFER</span><strong>Tokyo woman</strong></button>
-      </div>
-      <div class="demoStack">
-        <article class="demo" id="demo-p07" role="tabpanel" hidden>
-          <div class="demoCopy"><p class="eyebrow">30 seconds · P07 flower vendor</p><h3>A sideways track should leave the opening composition.</h3><p>In this matched rollout, Rolling-Forcing stays close to the opening flower stall while TetherMem reveals new stalls, pedestrians, and street context as the camera moves sideways.</p></div>
-          <div class="videos">
-            <figure><div class="videoShell"><video controls playsinline preload="metadata" data-sync="p07-30" poster="assets/videos/p07-rolling-forcing-poster.jpg"><source src="assets/videos/p07-rolling-forcing.mp4" type="video/mp4" /></video><span class="label">Rolling-Forcing</span></div><figcaption>Opening composition remains dominant</figcaption></figure>
-            <figure><div class="videoShell"><video controls playsinline preload="metadata" data-sync="p07-30" poster="assets/videos/p07-tethermem-poster.jpg"><source src="assets/videos/p07-tethermem.mp4" type="video/mp4" /></video><span class="label tm">TetherMem</span></div><figcaption>Same P07 prompt and seed · independent 30-second rollout</figcaption></figure>
+          <article class="demo" id="demo-p01" role="tabpanel" aria-labelledby="tab-p01" hidden>
+            <div class="demoCopy"><p class="eyebrow">30 seconds · P01 fisherman harbor</p><h3>Coherent motion survives the full rollout.</h3><p>The videos share the P01 prompt and seed. Causal-Forcing darkens and loses scene detail in the later window; TetherMem retains the fisherman, his action, and the evolving harbor.</p></div>
+            <div class="videos">
+              <figure><div class="videoShell"><video controls playsinline preload="metadata" data-sync="p01-30" poster="assets/videos/p01-causal-forcing-poster.jpg"><source src="assets/videos/p01-causal-forcing.mp4" type="video/mp4" /></video><span class="label">Causal-Forcing</span></div><figcaption>Late-window contrast loss and scene degradation</figcaption></figure>
+              <figure><div class="videoShell"><video controls playsinline preload="metadata" data-sync="p01-30" poster="assets/videos/p01-tethermem-poster.jpg"><source src="assets/videos/p01-tethermem.mp4" type="video/mp4" /></video><span class="label tm">TetherMem</span></div><figcaption>Same P01 prompt and seed · independent 30-second rollout</figcaption></figure>
+            </div>
+            <div class="pairControls" data-sync-controls="p01-30"><button class="syncButton" type="button" data-pair="p01-30">Play both</button><label class="timeline"><span>Shared timeline</span><input type="range" min="0" max="30" step="0.05" value="0" data-scrubber="p01-30" aria-label="Shared timeline for the fisherman harbor comparison" /><output data-time="p01-30">0:00 / 0:30</output></label></div>
+          </article>
+
+          <article class="demo" id="demo-p03" role="tabpanel" aria-labelledby="tab-p03" hidden>
+            <div class="demoCopy"><p class="eyebrow">30 seconds · P03 dog in park</p><h3>Keep the dog identifiable as the park unfolds.</h3><p>This matched static-camera case separates subject continuity from uncontrolled scale drift. TetherMem preserves the dog while introducing new, coherent park context.</p></div>
+            <div class="videos">
+              <figure><div class="videoShell"><video controls playsinline preload="metadata" data-sync="p03-30" poster="assets/videos/p03-causvid-poster.jpg"><source src="assets/videos/p03-causvid.mp4" type="video/mp4" /></video><span class="label">CausVid</span></div><figcaption>Subject scale and framing drift over time</figcaption></figure>
+              <figure><div class="videoShell"><video controls playsinline preload="metadata" data-sync="p03-30" poster="assets/videos/p03-tethermem-poster.jpg"><source src="assets/videos/p03-tethermem.mp4" type="video/mp4" /></video><span class="label tm">TetherMem</span></div><figcaption>Same P03 prompt and seed · independent 30-second rollout</figcaption></figure>
+            </div>
+            <div class="pairControls" data-sync-controls="p03-30"><button class="syncButton" type="button" data-pair="p03-30">Play both</button><label class="timeline"><span>Shared timeline</span><input type="range" min="0" max="30" step="0.05" value="0" data-scrubber="p03-30" aria-label="Shared timeline for the dog in park comparison" /><output data-time="p03-30">0:00 / 0:30</output></label></div>
+          </article>
+
+          <article class="demo" id="demo-p04" role="tabpanel" aria-labelledby="tab-p04" hidden>
+            <div class="demoCopy"><p class="eyebrow">30 seconds · P04 cross-stack</p><h3>TetherMem transfers to the Deep-Forcing attention stack.</h3><p>This matched comparison isolates the routing intervention on Deep-Forcing. The outputs remain close overall, demonstrating cross-stack compatibility.</p></div>
+            <div class="videos">
+              <figure><div class="videoShell"><video controls playsinline preload="metadata" data-sync="p04-df-30" poster="assets/videos/p04-deep-forcing-poster.jpg"><source src="assets/videos/p04-deep-forcing.mp4" type="video/mp4" /></video><span class="label">Deep-Forcing</span></div><figcaption>Baseline · seed 639693304</figcaption></figure>
+              <figure><div class="videoShell"><video controls playsinline preload="metadata" data-sync="p04-df-30" poster="assets/videos/p04-deep-forcing-tethermem-poster.jpg"><source src="assets/videos/p04-deep-forcing-tethermem.mp4" type="video/mp4" /></video><span class="label tm">Deep-Forcing + TetherMem</span></div><figcaption>Same prompt, seed, and 30-second duration</figcaption></figure>
+            </div>
+            <div class="pairControls" data-sync-controls="p04-df-30"><button class="syncButton" type="button" data-pair="p04-df-30">Play both</button><label class="timeline"><span>Shared timeline</span><input type="range" min="0" max="30" step="0.05" value="0" data-scrubber="p04-df-30" aria-label="Shared timeline for the Tokyo comparison" /><output data-time="p04-df-30">0:00 / 0:30</output></label></div>
+          </article>
+        </div>
+      </div></section>
+
+      <section class="problem" id="problem"><div class="shell">
+        <div class="problemLead">
+          <div class="heading"><p class="eyebrow">The problem</p><h2>One memory policy cannot serve two opposite needs.</h2><p>Subject identity needs long-range access. Scene progression needs recency. Applying one frame-level memory policy to both creates the familiar identity–progression trade-off.</p></div>
+          <div class="thesisCard">The real choice is not “remember or forget.” It is <em>which query should read which part of memory.</em></div>
+        </div>
+
+        <div class="failureGrid" aria-label="Long-horizon failure modes">
+          <article class="failureCard"><span class="failureIcon">RF</span><h3>Rolling-Forcing</h3><p>A short rolling context can preserve local continuity while repeatedly returning to the opening view.</p><span class="failureTag">Failure · stagnation</span></article>
+          <article class="failureCard"><span class="failureIcon">DF</span><h3>Deep-Forcing</h3><p>Long-range motion can continue even as spatial detail and trajectory coherence deteriorate.</p><span class="failureTag">Failure · incoherent motion</span></article>
+          <article class="failureCard"><span class="failureIcon">RAG</span><h3>LongLive-RAG</h3><p>Frame-level retrieval gives subject and scene queries the same historical context, limiting progression.</p><span class="failureTag">Failure · shared policy</span></article>
+          <article class="failureCard tether"><span class="failureIcon">TM</span><h3>TetherMem</h3><p>Query-aware routing keeps identity-bearing history available while scene queries favor recent states.</p><span class="failureTag">Route · subject ≠ scene</span></article>
+        </div>
+
+        <details class="paperDisclosure">
+          <summary><span>Open the complete 120-second comparison · FIGURE 1</span></summary>
+          <div class="disclosureBody"><img src="assets/figures/figure1.png" loading="lazy" alt="Figure 1: four 120-second video trajectories comparing Rolling Forcing, Deep Forcing, LongLive-RAG, and TetherMem" /><p class="caption">Figure 1. A shared 120-second timeline exposes distinct failure modes: stagnation, incoherent motion, limited progression, and sustained scene evolution.</p></div>
+        </details>
+      </div></section>
+
+      <section class="method" id="method"><div class="shell">
+        <div class="heading"><p class="eyebrow">Method</p><h2>Route memory at the query level.</h2><p>TetherMem places a positive spatiotemporal routing prior inside attention normalization. Switch the query below to see how the same retrieved memory is read differently.</p></div>
+
+        <div class="routingExplorer" data-routing-mode="subject">
+          <div class="routeToolbar"><span>Interactive routing view</span><div class="routeTabs" role="tablist" aria-label="Choose a query type"><button class="routeTab" type="button" role="tab" aria-selected="true" data-route-mode="subject">Subject query</button><button class="routeTab" type="button" role="tab" aria-selected="false" data-route-mode="scene">Scene query</button></div></div>
+          <div class="routeDiagram">
+            <div class="routeNode queryNode"><span>Current query</span><strong data-query-label>Subject query</strong><small data-query-copy>“Is this still the same person?”</small></div>
+            <span class="routeArrow" aria-hidden="true">→</span>
+            <div class="memoryBank">
+              <div class="memoryMeta"><span>Retrieved memory</span><strong data-memory-label>Identity-bearing history stays open</strong></div>
+              <div class="memoryCells" aria-label="Routing weights from old to recent memory">
+                <div class="memoryCell" style="--subject: 78px; --scene: 12px"><i></i><small>t−5</small></div>
+                <div class="memoryCell" style="--subject: 70px; --scene: 20px"><i></i><small>t−4</small></div>
+                <div class="memoryCell" style="--subject: 64px; --scene: 34px"><i></i><small>t−3</small></div>
+                <div class="memoryCell" style="--subject: 72px; --scene: 56px"><i></i><small>t−2</small></div>
+                <div class="memoryCell" style="--subject: 82px; --scene: 86px"><i></i><small>t−1</small></div>
+              </div>
+            </div>
+            <span class="routeArrow" aria-hidden="true">→</span>
+            <div class="routeNode readoutNode"><span>Readout</span><strong data-readout-label>Tether the subject</strong><small data-readout-copy>Long-range identity evidence remains accessible.</small></div>
           </div>
-          <div class="pairControls"><button class="syncButton" type="button" data-pair="p07-30">Play both from the same time</button></div>
-        </article>
+          <div class="routeLegend"><span><b>t−5</b> older memory</span><span>Bar height = relative routing weight</span><span><b>t−1</b> recent memory</span></div>
+        </div>
 
-        <article class="demo" id="demo-p01" role="tabpanel" hidden>
-          <div class="demoCopy"><p class="eyebrow">30 seconds · P01 fisherman harbor</p><h3>Coherent motion survives the full rollout.</h3><p>The two videos share the P01 prompt and seed. Causal-Forcing darkens and loses scene detail in the later window; TetherMem retains the fisherman, his action, and the evolving harbor.</p></div>
-          <div class="videos">
-            <figure><div class="videoShell"><video controls playsinline preload="metadata" data-sync="p01-30" poster="assets/videos/p01-causal-forcing-poster.jpg"><source src="assets/videos/p01-causal-forcing.mp4" type="video/mp4" /></video><span class="label">Causal-Forcing</span></div><figcaption>Late-window contrast loss and scene degradation</figcaption></figure>
-            <figure><div class="videoShell"><video controls playsinline preload="metadata" data-sync="p01-30" poster="assets/videos/p01-tethermem-poster.jpg"><source src="assets/videos/p01-tethermem.mp4" type="video/mp4" /></video><span class="label tm">TetherMem</span></div><figcaption>Same P01 prompt and seed · independent 30-second rollout</figcaption></figure>
-          </div>
-          <div class="pairControls"><button class="syncButton" type="button" data-pair="p01-30">Play both from the same time</button></div>
-        </article>
+        <div class="formulaDeck" aria-label="Core routing equations">
+          <article class="formulaCard"><span class="formulaTag">Normalized routing</span><div class="equation">Ã<sub>q,i</sub> = softmax(s<sub>q,i</sub> + log π<sub>n</sub>(q,i))</div><p class="formulaNote">The prior changes selection while attention remains normalized.</p></article>
+          <article class="formulaCard"><span class="formulaTag">Region prior</span><div class="equation">π<sub>reg</sub> = 1<br />or γ<sub>n</sub></div><p class="formulaNote">Same-region paths stay open; cross-region reads are softened.</p></article>
+          <article class="formulaCard"><span class="formulaTag">Recency prior</span><div class="equation">ρ<sub>i</sub> = max(τ<sub>i</sub>, ρ<sub>min</sub>)</div><p class="formulaNote">Background queries favor recent scene states.</p></article>
+        </div>
 
-        <article class="demo" id="demo-p03" role="tabpanel" hidden>
-          <div class="demoCopy"><p class="eyebrow">30 seconds · P03 dog in park</p><h3>Keep the dog identifiable as the park unfolds.</h3><p>This matched static-camera case separates subject continuity from uncontrolled scale drift. TetherMem preserves the dog while introducing new, coherent park context.</p></div>
-          <div class="videos">
-            <figure><div class="videoShell"><video controls playsinline preload="metadata" data-sync="p03-30" poster="assets/videos/p03-causvid-poster.jpg"><source src="assets/videos/p03-causvid.mp4" type="video/mp4" /></video><span class="label">CausVid</span></div><figcaption>Subject scale and framing drift over time</figcaption></figure>
-            <figure><div class="videoShell"><video controls playsinline preload="metadata" data-sync="p03-30" poster="assets/videos/p03-tethermem-poster.jpg"><source src="assets/videos/p03-tethermem.mp4" type="video/mp4" /></video><span class="label tm">TetherMem</span></div><figcaption>Same P03 prompt and seed · independent 30-second rollout</figcaption></figure>
-          </div>
-          <div class="pairControls"><button class="syncButton" type="button" data-pair="p03-30">Play both from the same time</button></div>
-        </article>
+        <div class="methodStory">
+          <article class="methodPanel">
+            <div class="panelCopy"><span class="panelIndex">02A</span><h3>End-to-end routing</h3><p>Current queries, retrieved history, and a time-aligned subject track meet at normalized memory routing. The subject is tethered; the scene is released.</p></div>
+            <figure><img src="assets/figures/method-a-cropped.png" loading="lazy" alt="Figure 2a: end-to-end TetherMem architecture and qualitative scene outcomes" /></figure>
+          </article>
+          <details class="methodDetails">
+            <summary>From frame selection to query routing · FIGURE 2B</summary>
+            <figure><img src="assets/figures/method-b-cropped.png" loading="lazy" alt="Figure 2b: comparison between prior frame-level memory selection and TetherMem query-conditioned routing" /></figure>
+          </details>
+        </div>
+      </div></section>
 
-        <article class="demo is-active" id="demo-p04" role="tabpanel">
-          <div class="demoCopy"><p class="eyebrow">30 seconds · P04 cross-stack</p><h3>TetherMem transfers to the Deep-Forcing attention stack.</h3><p>This matched comparison isolates the routing intervention on Deep-Forcing. The outputs remain close overall, demonstrating cross-stack compatibility.</p></div>
-          <div class="videos">
-            <figure><div class="videoShell"><video controls playsinline preload="metadata" data-sync="p04-df-30" poster="assets/videos/p04-deep-forcing-poster.jpg"><source src="assets/videos/p04-deep-forcing.mp4" type="video/mp4" /></video><span class="label">Deep-Forcing</span></div><figcaption>Baseline · seed 639693304</figcaption></figure>
-            <figure><div class="videoShell"><video controls playsinline preload="metadata" data-sync="p04-df-30" poster="assets/videos/p04-deep-forcing-tethermem-poster.jpg"><source src="assets/videos/p04-deep-forcing-tethermem.mp4" type="video/mp4" /></video><span class="label tm">Deep-Forcing + TetherMem</span></div><figcaption>Same prompt, seed, and 30-second duration</figcaption></figure>
-          </div>
-          <div class="pairControls"><button class="syncButton" type="button" data-pair="p04-df-30">Play both from the same time</button></div>
-        </article>
-      </div>
-    </div></section>
+      <section class="results" id="evidence"><div class="shell">
+        <div class="evidenceIntro">
+          <div class="heading"><p class="eyebrow">Evidence</p><h2>Identity and progression can coexist.</h2><p>Human preference distinguishes coherent scene development from raw motion. TetherMem occupies the high-identity, high-progression region, while strong motion alone is not sufficient.</p></div>
+          <div class="evidenceBadge"><strong>76.9%</strong><span>scene-progression expected preference</span></div>
+        </div>
+        <figure class="paperFigure"><img src="assets/figures/evidence-landscape.png" loading="lazy" alt="Scatter plots comparing identity, scene progression, and normalized translation across video methods" /></figure>
+      </div></section>
 
-    <section class="trajectories"><div class="shell">
-      <div class="heading"><p class="eyebrow">Qualitative trajectories</p><h2>Progression appears across scenes.</h2><p>Matched trajectories sample the same backbone pair across multiple prompts and seven timestamps over the 30-second evaluation window.</p></div>
-      <figure class="trajectory"><img src="assets/figures/trajectories.png" alt="Matched LongLive-RAG and TetherMem trajectories across four prompts and seven timestamps" /></figure>
-    </div></section>
+      <section class="trajectories" id="trajectories"><div class="shell">
+        <div class="heading"><p class="eyebrow">Qualitative trajectories</p><h2>Progression appears across scenes.</h2><p>Matched trajectories sample the same backbone pair across multiple prompts and seven timestamps over the 30-second evaluation window.</p></div>
+        <figure class="trajectory"><img src="assets/figures/trajectories.png" loading="lazy" alt="Matched LongLive-RAG and TetherMem trajectories across four prompts and seven timestamps" /></figure>
+      </div></section>
 
-    <section class="shell citation" id="citation">
-      <div class="heading"><p class="eyebrow">Citation</p><h2>Reference TetherMem.</h2><p>The arXiv identifier will be inserted here after submission.</p></div>
-      <pre class="bibtex"><code>@article{li2026tethermem,
+      <section class="citationSection" id="citation"><div class="shell citationGrid">
+        <div><div class="heading"><p class="eyebrow">Citation</p><h2>Reference TetherMem.</h2><p>The arXiv identifier will be inserted here after submission.</p></div><p class="copyStatus" id="copy-status" aria-live="polite"></p></div>
+        <div class="bibCard"><div class="bibToolbar"><span>BIBTEX</span><button class="copyButton" type="button" data-copy-bibtex>Copy BibTeX</button></div><pre class="bibtex" id="bibtex"><code>@article{li2026tethermem,
   title  = {Tether the Subject, Release the Scene:
             Query-Aware Memory Routing for Long-Horizon
             Autoregressive Video Generation},
@@ -267,40 +489,168 @@
             Sang, Nong and Gao, Changxin},
   year   = {2026},
   note   = {arXiv preprint}
-}</code></pre>
-    </section>
+}</code></pre></div>
+      </div></section>
+    </main>
 
     <footer><div class="shell footerGrid"><div><a class="wordmark" href="#top"><span class="mark">T</span><span>TetherMem</span></a><p>A joint research project by HUST and MiLM Plus, Xiaomi Inc.</p></div><div class="brand"><img src="assets/brand/hust.png" alt="Huazhong University of Science and Technology" /><img src="assets/brand/xiaomi.png" alt="MiLM Plus, Xiaomi Inc." /></div></div></footer>
+
     <script>
       const demoTabs = [...document.querySelectorAll("[data-demo-target]")];
       const demoPanels = [...document.querySelectorAll(".demo[role='tabpanel']")];
-      demoTabs.forEach((tab) => tab.addEventListener("click", () => {
+
+      function activateDemo(tab) {
         document.querySelectorAll("video").forEach((video) => video.pause());
-        demoTabs.forEach((item) => item.setAttribute("aria-selected", String(item === tab)));
+        demoTabs.forEach((item) => {
+          const active = item === tab;
+          item.setAttribute("aria-selected", String(active));
+          item.tabIndex = active ? 0 : -1;
+        });
         demoPanels.forEach((panel) => {
           const active = panel.id === tab.dataset.demoTarget;
-          panel.classList.toggle("is-active", active);
+          panel.classList.toggle("isActive", active);
           panel.hidden = !active;
         });
-      }));
-      document.querySelectorAll("[data-pair]").forEach((button) => {
-        const id = button.dataset.pair;
+      }
+
+      demoTabs.forEach((tab, index) => {
+        tab.tabIndex = tab.getAttribute("aria-selected") === "true" ? 0 : -1;
+        tab.addEventListener("click", () => activateDemo(tab));
+        tab.addEventListener("keydown", (event) => {
+          if (!['ArrowLeft', 'ArrowRight'].includes(event.key)) return;
+          event.preventDefault();
+          const direction = event.key === 'ArrowRight' ? 1 : -1;
+          const next = demoTabs[(index + direction + demoTabs.length) % demoTabs.length];
+          activateDemo(next);
+          next.focus();
+        });
+      });
+
+      const formatTime = (seconds) => {
+        const safe = Number.isFinite(seconds) ? Math.max(0, seconds) : 0;
+        const minutes = Math.floor(safe / 60);
+        return `${minutes}:${String(Math.floor(safe % 60)).padStart(2, '0')}`;
+      };
+
+      document.querySelectorAll("[data-sync-controls]").forEach((controls) => {
+        const id = controls.dataset.syncControls;
+        const button = controls.querySelector(`[data-pair="${id}"]`);
+        const scrubber = controls.querySelector(`[data-scrubber="${id}"]`);
+        const output = controls.querySelector(`[data-time="${id}"]`);
         const videos = [...document.querySelectorAll(`video[data-sync="${id}"]`)];
+        let syncing = false;
+
+        const duration = () => {
+          const values = videos.map((video) => video.duration).filter(Number.isFinite);
+          return values.length ? Math.min(...values) : Number(scrubber.max);
+        };
+
+        const updateTimeline = (time = videos[0]?.currentTime || 0) => {
+          const total = duration();
+          scrubber.max = String(total || 30);
+          scrubber.value = String(Math.min(time, total || 30));
+          output.value = `${formatTime(time)} / ${formatTime(total || 30)}`;
+        };
+
+        videos.forEach((video) => {
+          video.addEventListener("loadedmetadata", () => updateTimeline());
+          video.addEventListener("ended", () => {
+            if (videos.every((item) => item.ended || item.paused)) button.textContent = "Replay both";
+          });
+          video.addEventListener("seeked", () => {
+            if (syncing) return;
+            syncing = true;
+            videos.forEach((other) => {
+              if (other !== video && Math.abs(other.currentTime - video.currentTime) > .08) other.currentTime = video.currentTime;
+            });
+            updateTimeline(video.currentTime);
+            requestAnimationFrame(() => { syncing = false; });
+          });
+        });
+
+        videos[0]?.addEventListener("timeupdate", () => {
+          updateTimeline(videos[0].currentTime);
+          if (!videos[0].paused && videos[1] && Math.abs(videos[1].currentTime - videos[0].currentTime) > .18) videos[1].currentTime = videos[0].currentTime;
+        });
+
+        scrubber.addEventListener("input", () => {
+          const time = Number(scrubber.value);
+          videos.forEach((video) => {
+            video.pause();
+            video.currentTime = time;
+          });
+          button.textContent = "Play both";
+          updateTimeline(time);
+        });
+
         button.addEventListener("click", async () => {
-          const shouldPlay = videos.some((video) => video.paused);
-          if (!shouldPlay) {
+          const allPlaying = videos.every((video) => !video.paused && !video.ended);
+          if (allPlaying) {
             videos.forEach((video) => video.pause());
-            button.textContent = "Play both from the same time";
+            button.textContent = "Play both";
             return;
           }
-          const sharedTime = Math.min(...videos.map((video) => Number.isFinite(video.currentTime) ? video.currentTime : 0));
+          let sharedTime = Number(scrubber.value);
+          if (videos.every((video) => video.ended) || sharedTime >= duration() - .1) sharedTime = 0;
           videos.forEach((video) => { video.currentTime = sharedTime; });
           await Promise.allSettled(videos.map((video) => video.play()));
           button.textContent = "Pause both";
         });
-        videos.forEach((video) => video.addEventListener("ended", () => {
-          if (videos.every((item) => item.ended || item.paused)) button.textContent = "Replay both";
-        }));
+      });
+
+      const routingExplorer = document.querySelector("[data-routing-mode]");
+      const routeCopy = {
+        subject: {
+          query: "Subject query",
+          prompt: "“Is this still the same person?”",
+          memory: "Identity-bearing history stays open",
+          readout: "Tether the subject",
+          detail: "Long-range identity evidence remains accessible."
+        },
+        scene: {
+          query: "Scene query",
+          prompt: "“What should the world look like now?”",
+          memory: "Recent scene states receive more weight",
+          readout: "Release the scene",
+          detail: "Recency discourages the background from snapping back."
+        }
+      };
+
+      document.querySelectorAll("[data-route-mode]").forEach((button) => {
+        button.addEventListener("click", () => {
+          const mode = button.dataset.routeMode;
+          const copy = routeCopy[mode];
+          routingExplorer.dataset.routingMode = mode;
+          document.querySelectorAll("[data-route-mode]").forEach((item) => item.setAttribute("aria-selected", String(item === button)));
+          routingExplorer.querySelector("[data-query-label]").textContent = copy.query;
+          routingExplorer.querySelector("[data-query-copy]").textContent = copy.prompt;
+          routingExplorer.querySelector("[data-memory-label]").textContent = copy.memory;
+          routingExplorer.querySelector("[data-readout-label]").textContent = copy.readout;
+          routingExplorer.querySelector("[data-readout-copy]").textContent = copy.detail;
+        });
+      });
+
+      const copyButton = document.querySelector("[data-copy-bibtex]");
+      const copyStatus = document.querySelector("#copy-status");
+      copyButton.addEventListener("click", async () => {
+        const text = document.querySelector("#bibtex code").textContent.trim();
+        try {
+          await navigator.clipboard.writeText(text);
+          copyButton.textContent = "Copied";
+          copyStatus.textContent = "BibTeX copied to your clipboard.";
+        } catch {
+          const textarea = document.createElement("textarea");
+          textarea.value = text;
+          textarea.style.position = "fixed";
+          textarea.style.opacity = "0";
+          document.body.appendChild(textarea);
+          textarea.select();
+          const copied = document.execCommand("copy");
+          textarea.remove();
+          copyButton.textContent = copied ? "Copied" : "Select manually";
+          copyStatus.textContent = copied ? "BibTeX copied to your clipboard." : "Clipboard access is unavailable; select the citation text manually.";
+        }
+        setTimeout(() => { copyButton.textContent = "Copy BibTeX"; }, 1800);
       });
     </script>
   </body>

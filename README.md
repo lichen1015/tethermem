@@ -1,9 +1,10 @@
 # TetherMem project page
 
-First public-facing project-page draft for the TetherMem paper. It contains a
-responsive single-page narrative, paper figures, four synchronized 30-second
-video comparisons, the current paper PDF, and placeholders for the final arXiv
-and code links.
+Public project page for the TetherMem paper, available at
+[lichen1015.github.io/tethermem](https://lichen1015.github.io/tethermem/). It
+contains an interactive query-routing explanation, four synchronized
+30-second video comparisons with a shared timeline, paper figures, the current
+paper PDF, and placeholders for the final arXiv and code links.
 
 ## Local preview
 
@@ -12,10 +13,9 @@ serve the `public/` folder with any small static web server.
 
 ## Publish with GitHub Pages
 
-1. Create an empty GitHub repository and push this folder to its `main` branch.
-2. In the repository, open **Settings → Pages**.
-3. Set **Source** to **GitHub Actions**.
-4. The included `.github/workflows/deploy-pages.yml` publishes `public/`.
+Push this folder to the `main` branch of
+[`lichen1015/tethermem`](https://github.com/lichen1015/tethermem). The included
+`.github/workflows/deploy-pages.yml` publishes `public/` through GitHub Pages.
 
 The public page is plain static HTML, so GitHub Pages does not need a server or
 a JavaScript build step. The optional `app/` directory is a component version;
