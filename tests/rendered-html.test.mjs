@@ -26,6 +26,8 @@ test("static GitHub Pages version contains the complete project narrative", asyn
   assert.match(html, /Changxin Gao<sup>1,\*<\/sup>/);
   assert.match(html, /Huazhong University of Science and Technology/);
   assert.match(html, /MiLM Plus, Xiaomi Inc\./);
+  assert.match(html, /assets\/brand\/xiaomi-logo\.svg/);
+  assert.doesNotMatch(html, /assets\/brand\/xiaomi\.png/);
   assert.match(html, /Zhang, Peng and Zhou, Hanyu/);
   assert.match(html, /76\.9%/);
   assert.match(html, /rel="canonical" href="https:\/\/lichen1015\.github\.io\/tethermem\/"/);
@@ -78,4 +80,16 @@ test("merged side-by-side demo media is present", async () => {
     assert.ok(video.size > 1_000_000, `${name}.mp4 should contain video data`);
     assert.ok(poster.size > 10_000, `${name}-poster.jpg should contain image data`);
   }
+});
+
+test("Xiaomi branding uses the vector logo exported from the paper asset", async () => {
+  const svg = await readFile(
+    new URL("../public/assets/brand/xiaomi-logo.svg", import.meta.url),
+    "utf8",
+  );
+
+  assert.match(svg, /<svg[^>]+viewBox="0 0 384 384"/);
+  assert.equal((svg.match(/<path\b/g) ?? []).length, 2);
+  assert.match(svg, /rgb\(100%, 41\.178894%, 0%\)/);
+  assert.match(svg, /rgb\(100%, 100%, 100%\)/);
 });

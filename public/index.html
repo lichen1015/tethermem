@@ -87,8 +87,9 @@
       .darkSurface::after { content: ""; position: absolute; inset: auto 0 0; height: 180px; background: linear-gradient(transparent, rgba(8, 22, 34, .78)); pointer-events: none; }
       .hero { position: relative; z-index: 1; min-height: 720px; padding: 142px 0 90px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
       .labLockup { margin-bottom: 33px; padding: 8px 14px; display: inline-flex; align-items: center; gap: 12px; border: 1px solid rgba(151, 198, 228, .18); border-radius: 999px; background: rgba(8, 22, 34, .5); color: #9fb4c2; font-size: .71rem; letter-spacing: .04em; }
-      .labLockup img { width: auto; height: 23px; object-fit: contain; filter: brightness(0) invert(1); opacity: .9; }
-      .labLockup img:last-of-type { height: 19px; }
+      .labLockup img { width: auto; height: 23px; object-fit: contain; opacity: .9; }
+      .labLockup img:not(.xiaomiLogo) { filter: brightness(0) invert(1); }
+      .labLockup img.xiaomiLogo { height: 22px; filter: none; opacity: 1; }
       .labLockup .plus { color: var(--cyan); font-weight: 800; }
       .kicker, .eyebrow { margin: 0 0 12px; color: #087eaa; font-size: .71rem; font-weight: 830; letter-spacing: .17em; text-transform: uppercase; }
       .darkSurface .kicker, .demos .eyebrow { color: var(--cyan); }
@@ -359,7 +360,7 @@
         .wordmark { font-size: .91rem; }
         .labLockup { max-width: 100%; gap: 8px; font-size: .61rem; }
         .labLockup img { height: 19px; }
-        .labLockup img:last-of-type { height: 16px; }
+        .labLockup img.xiaomiLogo { height: 19px; }
         .demoNav { grid-template-columns: 1fr; }
         .authors { font-size: .84rem; }
         .affiliations { font-size: .77rem; }
@@ -388,7 +389,7 @@
       <div class="darkSurface">
         <header class="hero shell" id="top">
           <div class="labLockup" aria-label="HUST and MiLM Plus, Xiaomi Inc.">
-            <img src="assets/brand/hust.png" alt="" /><span>HUST</span><span class="plus">×</span><img src="assets/brand/xiaomi.png" alt="" /><span>MiLM Plus</span>
+            <img src="assets/brand/hust.png" alt="" /><span>HUST</span><span class="plus">×</span><img class="xiaomiLogo" src="assets/brand/xiaomi-logo.svg" alt="" /><span>MiLM Plus</span>
           </div>
           <p class="kicker">Long-horizon autoregressive video generation</p>
           <h1>Tether the Subject,<br /><span>Release the Scene.</span></h1>
@@ -587,7 +588,7 @@
       </div></section>
     </main>
 
-    <footer><div class="shell footerGrid"><div><a class="wordmark" href="#top"><span class="mark">T</span><span>TetherMem</span></a><p>A joint research project by HUST and MiLM Plus, Xiaomi Inc.</p></div><div class="brand"><img src="assets/brand/hust.png" alt="Huazhong University of Science and Technology" /><img src="assets/brand/xiaomi.png" alt="MiLM Plus, Xiaomi Inc." /></div></div></footer>
+    <footer><div class="shell footerGrid"><div><a class="wordmark" href="#top"><span class="mark">T</span><span>TetherMem</span></a><p>A joint research project by HUST and MiLM Plus, Xiaomi Inc.</p></div><div class="brand"><img src="assets/brand/hust.png" alt="Huazhong University of Science and Technology" /><img src="assets/brand/xiaomi-logo.svg" alt="MiLM Plus, Xiaomi Inc." /></div></div></footer>
 
     <script>
       const revealItems = [...document.querySelectorAll("[data-reveal]")];
